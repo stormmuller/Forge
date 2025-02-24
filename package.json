@@ -41,7 +41,7 @@
     "@rive-app/canvas": "^2.25.7",
     "@types/howler": "^2.2.11",
     "@types/seedrandom": "^3.0.8",
-    "@vitest/ui": "^3.0.4",
+    "@vitest/ui": "^3.0.6",
     "cspell": "^8.17.3",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
