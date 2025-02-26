@@ -1,13 +1,13 @@
-import { ecs, rendering } from '../../src';
+import * as forge from '../../src';
 
 export const createRenderLayer = (
-  layerService: rendering.LayerService,
-  cameraEntity: ecs.Entity,
-  world: ecs.World,
+  layerService: forge.LayerService,
+  cameraEntity: forge.Entity,
+  world: forge.World,
 ) => {
   const foregroundRenderLayer = layerService.createLayer('foreground');
 
-  const foregroundRenderSystem = new rendering.RenderSystem({
+  const foregroundRenderSystem = new forge.RenderSystem({
     layer: foregroundRenderLayer,
     cameraEntity,
   });

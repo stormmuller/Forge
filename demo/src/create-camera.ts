@@ -1,17 +1,17 @@
-import { common, ecs, game, rendering } from '../../src';
+import * as forge from '../../src';
 
 export const createCameras = (
-  world: ecs.World,
-  worldSpace: common.Space,
-  inputsEntity: ecs.Entity,
-  game: game.Game,
+  world: forge.World,
+  worldSpace: forge.Space,
+  inputsEntity: forge.Entity,
+  game: forge.Game,
 ) => {
-  const worldCamera = new ecs.Entity('World Camera', [
-    new rendering.CameraComponent(),
-    new common.PositionComponent(worldSpace.center.x, worldSpace.center.y),
+  const worldCamera = new forge.Entity('World Camera', [
+    new forge.CameraComponent(),
+    new forge.PositionComponent(worldSpace.center.x, worldSpace.center.y),
   ]);
 
-  const cameraSystem = new rendering.CameraSystem(inputsEntity, game.time);
+  const cameraSystem = new forge.CameraSystem(inputsEntity, game.time);
 
   world.addEntity(worldCamera);
   world.addSystem(cameraSystem);

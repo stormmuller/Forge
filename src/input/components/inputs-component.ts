@@ -1,6 +1,6 @@
-import { Component } from '../../ecs';
+import type { Component } from '../../ecs';
 import { Vector2 } from '../../math';
-import { MouseButton } from '../constants';
+import type { MouseButton } from '../constants';
 
 /**
  * The `InputsComponent` tracks various input states such as key presses, mouse button

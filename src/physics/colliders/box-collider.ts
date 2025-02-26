@@ -1,5 +1,5 @@
 import { Vector2 } from '../../math';
-import { Collider } from './collider';
+import type { Collider } from './collider';
 
 /**
  * The `BoxCollider` class represents a rectangular collider defined by a point and dimensions.

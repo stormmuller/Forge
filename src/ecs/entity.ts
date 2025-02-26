@@ -1,4 +1,4 @@
-import { OrNull } from '../common';
+import type { OrNull } from '../common';
 import type { Component } from './types';
 
 /**

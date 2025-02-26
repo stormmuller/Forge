@@ -1,33 +1,26 @@
-import {
-  animations,
-  assetLoading,
-  common,
-  ecs,
-  math,
-  rendering,
-} from '../../../../src';
+import * as forge from '../../../../src';
 import { StarfieldComponent } from '../components';
 
-export class StarfieldSystem extends ecs.System {
-  private _world: ecs.World;
-  private _imageCache: assetLoading.ImageCache;
-  private _renderLayer: rendering.RenderLayer;
-  private _random: math.Random;
+export class StarfieldSystem extends forge.System {
+  private _world: forge.World;
+  private _imageCache: forge.ImageCache;
+  private _renderLayer: forge.RenderLayer;
+  private _random: forge.Random;
 
   constructor(
-    world: ecs.World,
-    imageCache: assetLoading.ImageCache,
-    renderLayer: rendering.RenderLayer,
+    world: forge.World,
+    imageCache: forge.ImageCache,
+    renderLayer: forge.RenderLayer,
   ) {
     super('starfield', [StarfieldComponent.symbol]);
 
     this._world = world;
     this._imageCache = imageCache;
     this._renderLayer = renderLayer;
-    this._random = new math.Random('starfield');
+    this._random = new forge.Random('starfield');
   }
 
-  public async run(entity: ecs.Entity): Promise<void> {
+  public async run(entity: forge.Entity): Promise<void> {
     const starfieldComponent = entity.getComponentRequired<StarfieldComponent>(
       StarfieldComponent.symbol,
     );
@@ -43,23 +36,23 @@ export class StarfieldSystem extends ecs.System {
   private async _createStar(starfieldComponent: StarfieldComponent) {
     const image = await this._imageCache.getOrLoad('star_small.png');
 
-    const sprite = new rendering.Sprite({
+    const sprite = new forge.Sprite({
       image,
       renderLayer: this._renderLayer,
     });
 
-    const scaleComponent = new common.ScaleComponent(0.5, 0.5);
+    const scaleComponent = new forge.ScaleComponent(0.5, 0.5);
 
     this._world.addEntity(
-      new ecs.Entity('star', [
-        new common.PositionComponent(
+      new forge.Entity('star', [
+        new forge.PositionComponent(
           Math.random() * window.innerWidth,
           Math.random() * window.innerHeight,
         ),
         scaleComponent,
-        new common.RotationComponent(0),
-        new rendering.SpriteComponent(sprite),
-        new animations.AnimationComponent({
+        new forge.RotationComponent(0),
+        new forge.SpriteComponent(sprite),
+        new forge.AnimationComponent({
           duration: this._random.randomFloat(1000, 5000),
           updateCallback: (value: number) => {
             scaleComponent.x = value * 0.5;

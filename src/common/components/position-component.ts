@@ -1,4 +1,4 @@
-import { Component } from '../../ecs';
+import type { Component } from '../../ecs';
 import { Vector2 } from '../../math';
 
 /**

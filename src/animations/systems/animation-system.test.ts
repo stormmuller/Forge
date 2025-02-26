@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AnimationSystem } from './animation-system';
 import { Entity } from '../../ecs';
 import { Time } from '../../common';
-import { AnimatedProperty, AnimationComponent } from '../components';
+import { type AnimatedProperty, AnimationComponent } from '../components';
 
 describe('AnimationSystem', () => {
   it('should update animations and call updateCallback', async () => {

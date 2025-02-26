@@ -1,4 +1,4 @@
-import { Stoppable } from '../../common';
+import type { Stoppable } from '../../common';
 import { Entity } from '../entity';
 
 /**
@@ -43,9 +43,7 @@ export abstract class System implements Stoppable {
 
     const modifiedEntities = this.beforeAll(entities);
 
-    for (let i = 0; i < modifiedEntities.length; i++) {
-      const entity = modifiedEntities[i];
-
+    for (const entity of modifiedEntities) {
       this.run(entity);
     }
   }

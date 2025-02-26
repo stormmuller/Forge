@@ -1,4 +1,4 @@
-import { Component } from '../../ecs';
+import type { Component } from '../../ecs';
 
 export interface TimerTask {
   callback: () => void;

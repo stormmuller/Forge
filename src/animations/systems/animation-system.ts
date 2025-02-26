@@ -1,6 +1,6 @@
 import { Entity, System } from '../../ecs';
 import { Time } from '../../common';
-import { AnimatedProperty, AnimationComponent } from '../components';
+import { type AnimatedProperty, AnimationComponent } from '../components';
 
 /**
  * System that manages and updates animations for entities.
@@ -34,7 +34,7 @@ export class AnimationSystem extends System {
 
     // Iterate backwards so we can safely remove animations
     for (let i = animationComponent.animations.length - 1; i >= 0; i--) {
-      const animation = animationComponent.animations[i];
+      const animation = animationComponent.animations[i]!;
       const animationComplete = this._updateAnimation(animation, deltaTime);
 
       if (animationComplete) {

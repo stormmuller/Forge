@@ -1,4 +1,4 @@
-import { AssetCache } from '..';
+import type { AssetCache } from '../asset-cache';
 
 /**
  * Class to manage the caching and loading of images.

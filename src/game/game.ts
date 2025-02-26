@@ -1,4 +1,4 @@
-import { Stoppable, Time } from '../common';
+import { type Stoppable, Time } from '../common';
 import { Event } from '../events';
 import { Scene } from './scene';
 

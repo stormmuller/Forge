@@ -1,4 +1,4 @@
-import { animations, utilities } from '../../src';
+import * as forge from '../../src';
 import './style.css';
 import { createShip } from './create-ship';
 import { DEFAULT_LAYERS } from '../../src/rendering';
@@ -7,7 +7,7 @@ import { createStarfield } from './create-starfield';
 import { StarfieldSystem } from './starfield';
 
 const { imageCache, world, game, layerService, inputsEntity } =
-  await utilities.createGame({
+  await forge.createGame({
     container: document.getElementById('game-container') as HTMLDivElement,
     layers: ['foreground'],
   });
@@ -23,7 +23,7 @@ const starfieldSystem = new StarfieldSystem(
   imageCache,
   foregroundRenderLayer,
 );
-const animationSystem = new animations.AnimationSystem(game.time);
+const animationSystem = new forge.AnimationSystem(game.time);
 
 world.addSystems([shipMovementSystem, starfieldSystem, animationSystem]);
 

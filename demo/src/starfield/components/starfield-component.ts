@@ -1,6 +1,6 @@
-import { ecs } from '../../../../src';
+import * as forge from '../../../../src';
 
-export class StarfieldComponent implements ecs.Component {
+export class StarfieldComponent implements forge.Component {
   public name: symbol;
   public targetNumberOfStars: number;
   public numberOfStars: number;

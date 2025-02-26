@@ -1,6 +1,6 @@
 import { Vector2 } from '../math';
 import { RenderLayer } from './render-layer';
-import { CLEAR_STRATEGY, CLEAR_STRATEGY_KEYS } from './types';
+import { CLEAR_STRATEGY, type CLEAR_STRATEGY_KEYS } from './types';
 
 /**
  * Options for creating a new render layer.

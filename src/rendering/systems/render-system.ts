@@ -8,7 +8,7 @@ import { Entity, System } from '../../ecs';
 import { CameraComponent, SpriteComponent } from '../components';
 import { RenderLayer } from '../render-layer';
 import { createProjectionMatrix } from '../shaders/utils/create-projection-matrix';
-import { Vector2 } from '../../math';
+import { Matrix3x3, Vector2 } from '../../math';
 import {
   createProgram,
   spriteFragmentShader,
@@ -172,7 +172,7 @@ export class RenderSystem extends System {
     );
 
     // Send it to the GPU
-    this._layer.context.uniformMatrix3fv(uMatrixLoc, false, mat);
+    this._layer.context.uniformMatrix3fv(uMatrixLoc, false, mat.data);
 
     // Draw the quad (two triangles, 6 vertices)
     this._layer.context.drawArrays(this._layer.context.TRIANGLES, 0, 6);
@@ -216,54 +216,6 @@ export class RenderSystem extends System {
   }
 
   /**
-   * Translates the given matrix by the specified x and y values.
-   * @param matrix - The matrix to translate.
-   * @param tx - The x translation value.
-   * @param ty - The y translation value.
-   * @returns The translated matrix.
-   */
-  private _translate(matrix: number[], tx: number, ty: number) {
-    matrix[6] += matrix[0] * tx + matrix[3] * ty;
-    matrix[7] += matrix[1] * tx + matrix[4] * ty;
-    return matrix;
-  }
-
-  /**
-   * Rotates the given matrix by the specified radians.
-   * @param matrix - The matrix to rotate.
-   * @param radians - The rotation angle in radians.
-   * @returns The rotated matrix.
-   */
-  private _rotate(matrix: number[], radians: number) {
-    const c = Math.cos(radians);
-    const s = Math.sin(radians);
-    const m0 = matrix[0],
-      m1 = matrix[1],
-      m3 = matrix[3],
-      m4 = matrix[4];
-    matrix[0] = c * m0 + s * m3;
-    matrix[1] = c * m1 + s * m4;
-    matrix[3] = -s * m0 + c * m3;
-    matrix[4] = -s * m1 + c * m4;
-    return matrix;
-  }
-
-  /**
-   * Scales the given matrix by the specified x and y values.
-   * @param matrix - The matrix to scale.
-   * @param sx - The x scale value.
-   * @param sy - The y scale value.
-   * @returns The scaled matrix.
-   */
-  private _scale(matrix: number[], sx: number, sy: number) {
-    matrix[0] *= sx;
-    matrix[1] *= sx;
-    matrix[3] *= sy;
-    matrix[4] *= sy;
-    return matrix;
-  }
-
-  /**
    * Computes the transformation matrix for rendering a sprite.
    * @param position - The position of the sprite.
    * @param rotation - The rotation angle of the sprite in radians.
@@ -280,16 +232,17 @@ export class RenderSystem extends System {
     spriteHeight: number,
     scale: Vector2,
     pivot: Vector2,
-  ) {
+  ): Matrix3x3 {
     const matrix = createProjectionMatrix(
       this._layer.canvas.width,
       this._layer.canvas.height,
     );
 
-    this._translate(matrix, position.x, position.y);
-    this._rotate(matrix, rotation);
-    this._scale(matrix, scale.x * spriteWidth, scale.y * spriteHeight);
-    this._translate(matrix, -pivot.x, -pivot.y);
+    matrix
+      .translate(position.x, position.y)
+      .rotate(rotation)
+      .scale(scale.x * spriteWidth, scale.y * spriteHeight)
+      .translate(-pivot.x, -pivot.y);
 
     return matrix;
   }

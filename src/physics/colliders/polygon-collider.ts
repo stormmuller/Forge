@@ -1,5 +1,5 @@
 import { Vector2 } from '../../math';
-import { Collider } from './collider';
+import type { Collider } from './collider';
 
 /**
  * The `PolygonCollider` class represents a polygonal collider defined by an array of points.
@@ -14,6 +14,10 @@ export class PolygonCollider implements Collider<PolygonCollider> {
    * @param points - The points defining the polygon.
    */
   constructor(points: Vector2[]) {
+    if (points.length < 3) {
+      throw new Error('PolygonCollider requires at least 3 points');
+    }
+
     this.points = points;
   }
 
@@ -22,12 +26,14 @@ export class PolygonCollider implements Collider<PolygonCollider> {
    * @returns The minimum x-coordinate.
    */
   get minX(): number {
-    let min = this.points[0].x;
-    for (let i = 1; i < this.points.length; i++) {
-      if (this.points[i].x < min) {
-        min = this.points[i].x;
+    let min = Number.MAX_SAFE_INTEGER;
+
+    for (const point of this.points) {
+      if (point.x < min) {
+        min = point.x;
       }
     }
+
     return min;
   }
 
@@ -36,12 +42,14 @@ export class PolygonCollider implements Collider<PolygonCollider> {
    * @returns The maximum x-coordinate.
    */
   get maxX(): number {
-    let max = this.points[0].x;
-    for (let i = 1; i < this.points.length; i++) {
-      if (this.points[i].x > max) {
-        max = this.points[i].x;
+    let max = Number.MIN_SAFE_INTEGER;
+
+    for (const point of this.points) {
+      if (point.x > max) {
+        max = point.x;
       }
     }
+
     return max;
   }
 
@@ -50,12 +58,14 @@ export class PolygonCollider implements Collider<PolygonCollider> {
    * @returns The minimum y-coordinate.
    */
   get minY(): number {
-    let min = this.points[0].y;
-    for (let i = 1; i < this.points.length; i++) {
-      if (this.points[i].y < min) {
-        min = this.points[i].y;
+    let min = Number.MAX_SAFE_INTEGER;
+
+    for (const point of this.points) {
+      if (point.y < min) {
+        min = point.y;
       }
     }
+
     return min;
   }
 
@@ -64,12 +74,14 @@ export class PolygonCollider implements Collider<PolygonCollider> {
    * @returns The maximum y-coordinate.
    */
   get maxY(): number {
-    let max = this.points[0].y;
-    for (let i = 1; i < this.points.length; i++) {
-      if (this.points[i].y > max) {
-        max = this.points[i].y;
+    let max = Number.MIN_SAFE_INTEGER;
+
+    for (const point of this.points) {
+      if (point.y > max) {
+        max = point.y;
       }
     }
+
     return max;
   }
 
@@ -83,8 +95,8 @@ export class PolygonCollider implements Collider<PolygonCollider> {
     const n = this.points.length;
 
     for (let i = 0; i < n; i++) {
-      const current = this.points[i];
-      const next = this.points[(i + 1) % n];
+      const current = this.points[i]!;
+      const next = this.points[(i + 1) % n]!;
 
       // Check if the ray from 'point' crosses this edge
       if (current.y <= point.y) {
@@ -166,10 +178,11 @@ export class PolygonCollider implements Collider<PolygonCollider> {
       .sort((a, b) => (a.x === b.x ? a.y - b.y : a.x - b.x));
 
     const lower: Vector2[] = [];
+
     for (const p of points) {
       while (
         lower.length >= 2 &&
-        this._cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0
+        this._cross(lower[lower.length - 2]!, lower[lower.length - 1]!, p) <= 0
       ) {
         lower.pop();
       }
@@ -178,14 +191,19 @@ export class PolygonCollider implements Collider<PolygonCollider> {
 
     const upper: Vector2[] = [];
     for (let i = points.length - 1; i >= 0; i--) {
-      const p = points[i];
+      const point = points[i]!;
+
       while (
         upper.length >= 2 &&
-        this._cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0
+        this._cross(
+          upper[upper.length - 2]!,
+          upper[upper.length - 1]!,
+          point,
+        ) <= 0
       ) {
         upper.pop();
       }
-      upper.push(p);
+      upper.push(point);
     }
 
     // Remove the last element of each list because it's the starting point of the other list
