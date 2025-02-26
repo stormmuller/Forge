@@ -25,7 +25,13 @@ export class Path implements Iterable<Vector2> {
    * @returns The point at the specified index.
    */
   public at(index: number): Vector2 {
-    return this.path[index];
+    const point = this.path[index];
+
+    if (!point) {
+      throw new Error(`Path index out of bounds: ${index}`);
+    }
+
+    return point;
   }
 
   /**
@@ -87,7 +93,7 @@ export class Path implements Iterable<Vector2> {
     return {
       next(): IteratorResult<Vector2> {
         if (index < path.length) {
-          return { value: path[index++], done: false };
+          return { value: path[index++]!, done: false };
         } else {
           return { done: true } as IteratorResult<Vector2>;
         }

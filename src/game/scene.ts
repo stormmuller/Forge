@@ -1,5 +1,5 @@
-import { Stoppable, Time } from '../common';
-import { Updatable } from './interfaces';
+import { type Stoppable, Time } from '../common';
+import type { Updatable } from './interfaces';
 
 /**
  * A scene in the game, which can contain updatable and stoppable objects.

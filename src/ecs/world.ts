@@ -1,5 +1,5 @@
-import { Stoppable } from '../common';
-import { Updatable } from '../game';
+import type { Stoppable } from '../common';
+import type { Updatable } from '../game';
 import { Entity, filterEntitiesByComponents } from './entity';
 import type { System } from './types';
 

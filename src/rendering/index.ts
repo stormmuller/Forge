@@ -5,4 +5,3 @@ export * from './sprite';
 export * from './systems';
 export * from './transforms';
 export * from './types';
-export * from './shaders';

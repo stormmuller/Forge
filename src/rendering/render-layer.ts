@@ -1,5 +1,5 @@
 import { Vector2 } from '../math';
-import { CLEAR_STRATEGY, CLEAR_STRATEGY_KEYS } from './types';
+import { CLEAR_STRATEGY, type CLEAR_STRATEGY_KEYS } from './types';
 
 /**
  * The `RenderLayer` class represents a rendering layer with its own canvas and WebGL context.

@@ -1,4 +1,4 @@
-import { Component } from '../../ecs';
+import type { Component } from '../../ecs';
 import { enforceArray } from '../../utilities';
 import { linear } from '../easing-functions';
 

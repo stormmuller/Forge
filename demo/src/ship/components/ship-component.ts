@@ -1,4 +1,4 @@
-import { ecs } from '../../../../src';
+import * as forge from '../../../../src';
 
 export interface ShipComponentOptions {
   speed: number;
@@ -10,7 +10,7 @@ const defaultOptions: ShipComponentOptions = {
   rotationSpeed: 0.1,
 };
 
-export class ShipComponent implements ecs.Component {
+export class ShipComponent implements forge.Component {
   public name: symbol;
   public speed: number;
   public rotationSpeed: number;

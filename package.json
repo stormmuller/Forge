@@ -1,6 +1,7 @@
 {
   "name": "@stormmuller/forge",
   "version": "1.1.5",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "exports": {
@@ -9,6 +10,7 @@
       "require": "./dist/index.js"
     }
   },
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "README.md"
@@ -18,10 +20,11 @@
     "url": "git+https://github.com/stormmuller/Forge.git"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc",
+    "dev": "vite --config vite.demo.config.js",
+    "build": "vite build",
     "test:ui": "vitest --reporter=html",
     "test": "vitest",
+    "check-exports": "attw --pack . --ignore-rules=false-esm",
     "check-types": "tsc --noEmit --project ci.tsconfig.json",
     "cspell": "cspell \"**\"",
     "lint": "eslint src",
@@ -30,17 +33,15 @@
     "prettier:write": "prettier . --write",
     "prepare": "husky",
     "demo:build": "tsc && vite build",
-    "demo:preview": "vite preview"
+    "demo:preview": "vite preview demo"
   },
   "author": "",
   "license": "MIT",
   "description": "",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.4",
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.6.0",
-    "@rive-app/canvas": "^2.25.7",
-    "@types/howler": "^2.2.11",
-    "@types/seedrandom": "^3.0.8",
     "@vitest/ui": "^3.0.4",
     "cspell": "^8.17.3",
     "eslint": "^9.19.0",
@@ -55,9 +56,13 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0",
     "vite": "^6.1.0",
+    "vite-plugin-dts": "^4.5.0",
     "vitest": "^3.0.5"
   },
   "dependencies": {
+    "@rive-app/canvas": "^2.25.7",
+    "@types/howler": "^2.2.12",
+    "@types/seedrandom": "^3.0.8",
     "howler": "^2.2.4",
     "seedrandom": "^3.0.5"
   }

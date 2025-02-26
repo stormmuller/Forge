@@ -1,5 +1,5 @@
-import { Howl, HowlOptions } from 'howler';
-import { Component } from '../../ecs';
+import { Howl, type HowlOptions } from 'howler';
+import type { Component } from '../../ecs';
 
 /**
  * Component to manage sounds in the game.

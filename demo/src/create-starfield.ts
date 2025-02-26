@@ -1,9 +1,9 @@
-import { ecs } from '../../src';
+import * as forge from '../../src';
 import { StarfieldComponent } from './starfield';
 
-export const createStarfield = async (world: ecs.World) => {
+export const createStarfield = async (world: forge.World) => {
   const starfieldComponent = new StarfieldComponent(500);
-  const starfieldEntity = new ecs.Entity('starfield', [starfieldComponent]);
+  const starfieldEntity = new forge.Entity('starfield', [starfieldComponent]);
 
   world.addEntity(starfieldEntity);
 

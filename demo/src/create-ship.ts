@@ -1,29 +1,29 @@
-import { assetLoading, common, ecs, rendering } from '../../src';
+import * as forge from '../../src';
 import { ShipComponent } from './ship';
 
 export const createShip = async (
-  imageCache: assetLoading.ImageCache,
-  renderLayer: rendering.RenderLayer,
-  world: ecs.World,
+  imageCache: forge.ImageCache,
+  renderLayer: forge.RenderLayer,
+  world: forge.World,
 ) => {
   const image = await imageCache.getOrLoad('ship_L.png');
-  const shipSprite = new rendering.Sprite({
+  const shipSprite = new forge.Sprite({
     image,
     renderLayer,
   });
 
-  const positionComponent = new common.PositionComponent(
+  const positionComponent = new forge.PositionComponent(
     window.innerWidth / 2,
     window.innerHeight - 100,
   );
 
-  const scaleComponent = new common.ScaleComponent();
+  const scaleComponent = new forge.ScaleComponent();
 
-  const shipEntity = new ecs.Entity('ship', [
+  const shipEntity = new forge.Entity('ship', [
     positionComponent,
     scaleComponent,
-    new common.RotationComponent(0),
-    new rendering.SpriteComponent(shipSprite),
+    new forge.RotationComponent(0),
+    new forge.SpriteComponent(shipSprite),
     new ShipComponent({
       rotationSpeed: 0.5,
       speed: 0.5,

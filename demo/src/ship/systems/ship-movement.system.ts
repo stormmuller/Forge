@@ -1,59 +1,59 @@
-import { common, ecs, input, math } from '../../../../src';
+import * as forge from '../../../../src';
 import { ShipComponent } from '../components';
 
-export class ShipMovementSystem extends ecs.System {
-  private _inputComponent: input.InputsComponent;
-  private _time: common.Time;
+export class ShipMovementSystem extends forge.System {
+  private _inputComponent: forge.InputsComponent;
+  private _time: forge.Time;
 
-  constructor(inputsEntity: ecs.Entity, time: common.Time) {
+  constructor(inputsEntity: forge.Entity, time: forge.Time) {
     super('ship-movement', [
       ShipComponent.symbol,
-      common.PositionComponent.symbol,
-      common.RotationComponent.symbol,
+      forge.PositionComponent.symbol,
+      forge.RotationComponent.symbol,
     ]);
 
     const inputComponent =
-      inputsEntity.getComponentRequired<input.InputsComponent>(
-        input.InputsComponent.symbol,
+      inputsEntity.getComponentRequired<forge.InputsComponent>(
+        forge.InputsComponent.symbol,
       );
 
     this._inputComponent = inputComponent;
     this._time = time;
   }
 
-  public async run(entity: ecs.Entity): Promise<void>  {
+  public async run(entity: forge.Entity): Promise<void>  {
     const player = entity.getComponentRequired<ShipComponent>(
       ShipComponent.symbol,
     );
 
-    const position = entity.getComponentRequired<common.PositionComponent>(
-      common.PositionComponent.symbol,
+    const position = entity.getComponentRequired<forge.PositionComponent>(
+      forge.PositionComponent.symbol,
     );
 
-    const rotation = entity.getComponentRequired<common.RotationComponent>(
-      common.RotationComponent.symbol,
+    const rotation = entity.getComponentRequired<forge.RotationComponent>(
+      forge.RotationComponent.symbol,
     );
 
-    const forwardVector = new math.Vector2(
+    const forwardVector = new forge.Vector2(
       Math.sin(rotation.radians),
       -Math.cos(rotation.radians),
     );
 
-    if (this._inputComponent.keyPressed(input.keyCodes.w)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.w)) {
       position.x += forwardVector.x * player.speed * this._time.deltaTime;
       position.y += forwardVector.y * player.speed * this._time.deltaTime;
     }
 
-    if (this._inputComponent.keyPressed(input.keyCodes.s)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.s)) {
       position.x -= forwardVector.x * player.speed * this._time.deltaTime;
       position.y -= forwardVector.y * player.speed * this._time.deltaTime;
     }
 
-    if (this._inputComponent.keyPressed(input.keyCodes.a)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.a)) {
       rotation.radians -= (player.rotationSpeed / 100) * this._time.deltaTime;
     }
 
-    if (this._inputComponent.keyPressed(input.keyCodes.d)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.d)) {
       rotation.radians += (player.rotationSpeed / 100) * this._time.deltaTime;
     }
   };

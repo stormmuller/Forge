@@ -1,9 +1,12 @@
-import { ecs, input } from '../../src';
+import * as forge from '../../src';
 
-export const createInputs = (world: ecs.World, gameContainer: HTMLElement) => {
-  const inputsEntity = new ecs.Entity('input', [new input.InputsComponent()]);
+export const createInputs = (
+  world: forge.World,
+  gameContainer: HTMLElement,
+) => {
+  const inputsEntity = new forge.Entity('input', [new forge.InputsComponent()]);
 
-  const inputSystem = new input.InputSystem(gameContainer);
+  const inputSystem = new forge.InputSystem(gameContainer);
 
   world.addEntity(inputsEntity);
   world.addSystem(inputSystem);

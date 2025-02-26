@@ -1,4 +1,4 @@
-import { Component } from '../../ecs';
+import type { Component } from '../../ecs';
 
 /**
  * Options for configuring the `CameraComponent`.
