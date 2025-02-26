@@ -17,7 +17,7 @@ export default defineConfig({
     minify: false,
   },
   test: {
-    include: ['../src/**/*.test.ts'],
+    include: ['src/**/*.test.ts'],
     environment: 'jsdom',
   },
   plugins: [dts({ tsconfigPath: './tsconfig.json', rollupTypes: true })],
