@@ -47,7 +47,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
     "@commitlint/cli": "^19.7.1",
-    "@commitlint/config-conventional": "^19.6.0",
+    "@commitlint/config-conventional": "^19.7.1",
     "@vitest/ui": "^3.0.7",
     "cspell": "^8.17.3",
     "eslint": "^9.21.0",
