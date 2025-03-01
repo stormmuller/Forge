@@ -1,4 +1,4 @@
-type Listener<T> = (eventData: T) => Promise<void>;
+type Listener<T> = (eventData: T) => void;
 
 /**
  * An parameterized event that can be raised and listened to.
@@ -61,10 +61,12 @@ export class ParameterizedEvent<TInput = null> {
    */
   public raise(input: TInput) {
     for (const listener of this._listeners) {
-      listener(input).catch((error) => {
+      try {
+        listener(input);
+      } catch (error) {
         console.error(`Error in listener for event ${this.name}:`, error);
         throw error;
-      });
+      }
     }
   }
 }

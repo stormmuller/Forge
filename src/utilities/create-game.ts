@@ -1,4 +1,4 @@
-import { ImageCache } from '../asset-loading';
+import { ImageCache, RiveCache } from '../asset-loading';
 import { PositionComponent, Space } from '../common';
 import { Entity, World } from '../ecs';
 import { Game, Scene } from '../game';
@@ -7,10 +7,13 @@ import { Vector2 } from '../math';
 import {
   CameraComponent,
   CameraSystem,
+  CLEAR_STRATEGY,
   DEFAULT_LAYER_NAMES,
+  ForgeRenderLayer,
   LayerService,
   RenderSystem,
 } from '../rendering';
+import { createCanvas } from '../rendering/create-canvas';
 import { createContainer } from './create-container';
 import { isString } from './is-string';
 
@@ -23,7 +26,7 @@ export type CreateGameOptions = {
 
 const defaultOptions: CreateGameOptions = {
   sceneName: 'main',
-  container: 'pf-game',
+  container: 'forge-game',
   layers: DEFAULT_LAYER_NAMES,
   dimensions: new Vector2(window.innerWidth, window.innerHeight),
 };
@@ -39,6 +42,7 @@ const defaultOptions: CreateGameOptions = {
  * - `gameContainer`: The HTML container element for the game.
  * - `scene`: The main Scene instance.
  * - `imageCache`: The ImageCache instance.
+ * - `riveCache`: The RiveCache instance.
  * - `worldSpace`: The Space instance representing the game world.
  * - `layerService`: The LayerService instance.
  * - `world`: The World instance managing the entities and systems.
@@ -67,9 +71,10 @@ export async function createGame(
 
   const scene = new Scene(mergedOptions.sceneName);
   const imageCache = new ImageCache();
+  const riveCache = new RiveCache();
 
   const worldSpace = new Space(mergedOptions.dimensions);
-  const layerService = new LayerService(gameContainer);
+  const layerService = new LayerService();
 
   const world = new World();
 
@@ -86,7 +91,11 @@ export async function createGame(
   ]);
 
   for (const layerName of mergedOptions.layers) {
-    const layer = layerService.createLayer(layerName);
+    const canvas = createCanvas(`$forge-layer-${layerName}`, gameContainer);
+    const layer = new ForgeRenderLayer(layerName, canvas, CLEAR_STRATEGY.blank);
+
+    layerService.registerLayer(layer);
+
     const layerRenderSystem = new RenderSystem({
       layer,
       cameraEntity,
@@ -110,6 +119,7 @@ export async function createGame(
     gameContainer,
     scene,
     imageCache,
+    riveCache,
     worldSpace,
     layerService,
     world,

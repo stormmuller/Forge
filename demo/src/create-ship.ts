@@ -3,7 +3,7 @@ import { ShipComponent } from './ship';
 
 export const createShip = async (
   imageCache: forge.ImageCache,
-  renderLayer: forge.RenderLayer,
+  renderLayer: forge.ForgeRenderLayer,
   world: forge.World,
 ) => {
   const image = await imageCache.getOrLoad('ship_L.png');
