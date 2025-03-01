@@ -76,6 +76,10 @@ export async function createGame(
   const worldSpace = new Space(mergedOptions.dimensions);
   const layerService = new LayerService();
 
+  window.addEventListener('resize', () => {
+    layerService.resizeAllLayers();
+  });
+
   const world = new World();
 
   const inputsEntity = new Entity('inputs', [new InputsComponent()]);
