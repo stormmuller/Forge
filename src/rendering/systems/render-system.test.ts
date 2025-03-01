@@ -7,11 +7,11 @@ import {
   ScaleComponent,
 } from '../../common';
 import { CameraComponent, SpriteComponent } from '../components';
-import { RenderLayer } from '../render-layer';
 import { Vector2 } from '../../math';
+import { ForgeRenderLayer } from '../render-layers';
 
 describe('RenderSystem', () => {
-  let renderLayer: RenderLayer;
+  let renderLayer: ForgeRenderLayer;
   let cameraEntity: Entity;
   let renderSystem: RenderSystem;
   let entity: Entity;
@@ -53,7 +53,7 @@ describe('RenderSystem', () => {
         width: 800,
         height: 600,
       },
-    } as unknown as RenderLayer;
+    } as unknown as ForgeRenderLayer;
 
     cameraComponent = {
       isStatic: false,
@@ -147,7 +147,7 @@ describe('RenderSystem', () => {
   });
 
   it('should not render the sprite if it belongs to a different render layer', async () => {
-    spriteComponent.sprite.renderLayer = {} as RenderLayer;
+    spriteComponent.sprite.renderLayer = {} as ForgeRenderLayer;
 
     await renderSystem.run(entity);
 

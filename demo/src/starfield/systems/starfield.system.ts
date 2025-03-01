@@ -4,13 +4,13 @@ import { StarfieldComponent } from '../components';
 export class StarfieldSystem extends forge.System {
   private _world: forge.World;
   private _imageCache: forge.ImageCache;
-  private _renderLayer: forge.RenderLayer;
+  private _renderLayer: forge.ForgeRenderLayer;
   private _random: forge.Random;
 
   constructor(
     world: forge.World,
     imageCache: forge.ImageCache,
-    renderLayer: forge.RenderLayer,
+    renderLayer: forge.ForgeRenderLayer,
   ) {
     super('starfield', [StarfieldComponent.symbol]);
 

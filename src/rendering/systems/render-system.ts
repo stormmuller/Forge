@@ -6,7 +6,6 @@ import {
 } from '../../common';
 import { Entity, System } from '../../ecs';
 import { CameraComponent, SpriteComponent } from '../components';
-import { RenderLayer } from '../render-layer';
 import { createProjectionMatrix } from '../shaders/utils/create-projection-matrix';
 import { Matrix3x3, Vector2 } from '../../math';
 import {
@@ -14,13 +13,14 @@ import {
   spriteFragmentShader,
   spriteVertexShader,
 } from '../shaders';
+import type { ForgeRenderLayer } from '../render-layers';
 
 /**
  * Options for configuring the `RenderSystem`.
  */
 export interface RenderSystemOptions {
   /** The render layer to use for rendering. */
-  layer: RenderLayer;
+  layer: ForgeRenderLayer;
 
   /** The entity that contains the camera component. */
   cameraEntity: Entity;
@@ -33,7 +33,7 @@ export interface RenderSystemOptions {
  * The `RenderSystem` class extends the `System` class and manages the rendering of sprites.
  */
 export class RenderSystem extends System {
-  private _layer: RenderLayer;
+  private _layer: ForgeRenderLayer;
   private _program: WebGLProgram;
 
   /**

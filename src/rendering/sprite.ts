@@ -1,5 +1,5 @@
 import { Vector2 } from '../math';
-import { RenderLayer } from './render-layer';
+import type { ForgeRenderLayer } from './render-layers';
 import { createTextureFromImage } from './shaders';
 
 /**
@@ -10,7 +10,7 @@ export type SpriteOptions = {
   image: HTMLImageElement;
 
   /** The render layer to which the sprite belongs. */
-  renderLayer: RenderLayer;
+  renderLayer: ForgeRenderLayer;
 
   /** The bleed value to apply to the sprite (optional). */
   bleed?: number;
@@ -35,7 +35,7 @@ export class Sprite {
   public image: HTMLImageElement;
 
   /** The render layer to which the sprite belongs. */
-  public renderLayer: RenderLayer;
+  public renderLayer: ForgeRenderLayer;
 
   /** The bleed value applied to the sprite. */
   public bleed: number;
