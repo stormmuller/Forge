@@ -1,5 +1,5 @@
-import { createContainer, Game, ImageCache, RiveCache } from '../../../src';
-import { createTitleScene } from '../scenes';
+import { createContainer, Game, ImageCache, RiveCache } from '../../src';
+import { createTitleScene } from './scenes';
 
 export const game = new Game();
 

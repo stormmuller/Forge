@@ -10,11 +10,12 @@ import {
 } from '@rive-app/canvas';
 import { RenderLayer } from './render-layer';
 import { EventDispatcher, ParameterizedEvent } from '../../events';
+import type { Stoppable } from '../../common';
 
 /**
  * The `RiveRenderLayer` class represents a rendering layer with its own canvas and rive instance.
  */
-export class RiveRenderLayer extends RenderLayer {
+export class RiveRenderLayer extends RenderLayer implements Stoppable {
   /** The Rive instance associated with the render layer. */
   public rive: Rive;
 
@@ -110,5 +111,21 @@ export class RiveRenderLayer extends RenderLayer {
     });
 
     return { rive, riveEventDispatcher };
+  }
+
+  public stop() {
+    const gl =
+      this.canvas.getContext('webgl2') || this.canvas.getContext('webgl');
+    if (gl) {
+      // It's WebGL
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    } else {
+      // Must be 2D
+      const ctx = this.canvas.getContext('2d')!;
+      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    this.rive.cleanup();
   }
 }

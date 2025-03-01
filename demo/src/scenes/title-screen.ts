@@ -1,9 +1,8 @@
 import { RiveEventPayload } from '@rive-app/canvas';
-import * as forge from '../../../../src';
-import { createShip } from './create-ship';
-import { createStarfield } from './create-starfield';
-import { ShipMovementSystem } from './ship';
-import { StarfieldSystem } from './starfield';
+import * as forge from '../../../src';
+import { createStarfield } from '../create-starfield';
+import { StarfieldSystem } from '../starfield';
+import { createShipPilotScene } from './ship-pilot';
 
 const riveFileUri = 'TitleScreen.riv';
 const riveStateMachine = 'Button';
@@ -48,8 +47,7 @@ export async function createTitleScene(
     cameraEntity,
   );
 
-  await createShip(imageCache, foregroundRenderLayer, world);
-  createStarfield(world);
+  createStarfield(world, 200);
 
   const riveFile = await riveCache.getOrLoad(riveFileUri);
 
@@ -69,11 +67,15 @@ export async function createTitleScene(
     onStartClickedEvent,
   );
 
-  onStartClickedEvent.registerListener((payload) => {
+  onStartClickedEvent.registerListener(async (payload) => {
     console.log('Start clicked', payload);
+    game.registerScene(
+      await createShipPilotScene(game, gameContainer, imageCache),
+    );
+
+    game.deregisterScene(scene);
   });
 
-  const shipMovementSystem = new ShipMovementSystem(inputsEntity, game.time);
   const starfieldSystem = new StarfieldSystem(
     world,
     imageCache,
@@ -81,7 +83,7 @@ export async function createTitleScene(
   );
   const animationSystem = new forge.AnimationSystem(game.time);
 
-  world.addSystems([shipMovementSystem, starfieldSystem, animationSystem]);
+  world.addSystems([starfieldSystem, animationSystem]);
 
   const cameraSystem = new forge.CameraSystem(inputsEntity, game.time);
 
@@ -90,6 +92,7 @@ export async function createTitleScene(
 
   scene.registerUpdatable(world);
   scene.registerStoppable(world);
+  scene.registerStoppable(riveRenderLayer);
 
   return scene;
 }

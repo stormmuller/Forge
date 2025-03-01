@@ -1,4 +1,4 @@
-import * as forge from '../../../../../../src';
+import * as forge from '../../../../src';
 import { ShipComponent } from '../components';
 
 export class ShipMovementSystem extends forge.System {
