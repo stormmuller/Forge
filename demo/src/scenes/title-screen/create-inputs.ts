@@ -1,4 +1,4 @@
-import * as forge from '../../src';
+import * as forge from '../../../src';
 
 export const createInputs = (
   world: forge.World,
