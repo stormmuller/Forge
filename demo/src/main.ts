@@ -6,9 +6,9 @@ import { StarfieldSystem } from './starfield';
 import * as forge from '../../src';
 import './style.css';
 
-const riveFileUri = 'ui.riv';
-const riveStateMachine = 'State Machine 1';
-const riveStartOnClickedEventName = 'OnStartClicked';
+const riveFileUri = 'TitleScreen.riv';
+const riveStateMachine = 'Button';
+const riveStartOnClickedEventName = 'OnClickButton';
 
 const {
   imageCache,
