@@ -1,11 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Space } from './space';
-import { Vector2 } from '../../math';
 
 describe('Space', () => {
   it('should create an instance of Space with the correct dimensions', () => {
-    const dimensions = new Vector2(800, 600);
-    const space = new Space(dimensions);
+    const space = new Space(800, 600);
 
     expect(space.width).toBe(800);
     expect(space.height).toBe(600);
@@ -14,11 +12,9 @@ describe('Space', () => {
   });
 
   it('should update the dimensions and center point of the space', () => {
-    const dimensions = new Vector2(800, 600);
-    const space = new Space(dimensions);
+    const space = new Space(800, 600);
 
-    const newDimensions = new Vector2(1024, 768);
-    space.setValue(newDimensions);
+    space.setValue(1024, 768);
 
     expect(space.width).toBe(1024);
     expect(space.height).toBe(768);
@@ -27,13 +23,11 @@ describe('Space', () => {
   });
 
   it('should raise the onSpaceChange event when dimensions are updated', () => {
-    const dimensions = new Vector2(800, 600);
-    const space = new Space(dimensions);
+    const space = new Space(800, 600);
 
     const mockRaise = vi.spyOn(space.onSpaceChange, 'raise');
 
-    const newDimensions = new Vector2(1024, 768);
-    space.setValue(newDimensions);
+    space.setValue(1024, 768);
 
     expect(mockRaise).toHaveBeenCalled();
   });

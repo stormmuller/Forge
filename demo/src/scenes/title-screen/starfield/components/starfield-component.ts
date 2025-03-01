@@ -1,4 +1,4 @@
-import * as forge from '../../../../src';
+import * as forge from '../../../../../../src';
 
 export class StarfieldComponent implements forge.Component {
   public name: symbol;

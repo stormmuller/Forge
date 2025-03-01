@@ -1,4 +1,4 @@
-import * as forge from '../../../../src';
+import * as forge from '../../../../../../src';
 import { StarfieldComponent } from '../components';
 
 export class StarfieldSystem extends forge.System {

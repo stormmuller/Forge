@@ -16,18 +16,19 @@ export class Space {
 
   /**
    * Creates an instance of Space.
-   * @param dimensions - The dimensions of the space.
+   * @param width - The width of the space.
+   * @param height - The height of the space.
    * @example
-   * const space = new Space(new Vector2(800, 600));
+   * const space = new Space(800, 600);
    * console.log(space.width); // 800
    * console.log(space.height); // 600
    * console.log(space.center); // Vector2 { x: 400, y: 300 }
    */
-  constructor(dimensions: Vector2) {
-    this._width = dimensions.x;
-    this._height = dimensions.y;
+  constructor(width: number, height: number) {
+    this._width = width;
+    this._height = height;
 
-    this._center = this._calculateCenter(dimensions);
+    this._center = new Vector2(this._width / 2, this._height / 2);
 
     this.onSpaceChange = new Event('space-change');
   }
@@ -61,11 +62,11 @@ export class Space {
    * @param dimensions - The new dimensions of the space.
    * @returns The updated Space instance.
    */
-  public setValue(dimensions: Vector2): Space {
-    this._width = dimensions.x;
-    this._height = dimensions.y;
+  public setValue(width: number, height: number): Space {
+    this._width = width;
+    this._height = height;
 
-    this._center = this._calculateCenter(dimensions);
+    this._calculateCenter();
 
     this.onSpaceChange.raise();
 
@@ -74,10 +75,8 @@ export class Space {
 
   /**
    * Calculates the center point of the space based on its dimensions.
-   * @param dimensions - The dimensions of the space.
-   * @returns The center point of the space.
    */
-  private _calculateCenter(dimensions: Vector2): Vector2 {
-    return new Vector2(dimensions.x / 2, dimensions.y / 2);
+  private _calculateCenter() {
+    this._center = new Vector2(this._width / 2, this._height / 2);
   }
 }

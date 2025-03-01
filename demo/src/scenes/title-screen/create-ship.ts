@@ -1,4 +1,4 @@
-import * as forge from '../../src';
+import * as forge from '../../../../src';
 import { ShipComponent } from './ship';
 
 export const createShip = async (
