@@ -211,5 +211,7 @@ export class World implements Updatable, Stoppable {
     for (const system of this._systems) {
       system.stop();
     }
+
+    this._entities.clear();
   }
 }

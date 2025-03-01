@@ -68,6 +68,7 @@ export class Game implements Stoppable {
    * @param scene - The scene to deregister.
    */
   public deregisterScene(scene: Scene) {
+    scene.stop();
     this._scenes.delete(scene);
   }
 
