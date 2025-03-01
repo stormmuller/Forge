@@ -34,4 +34,10 @@ export class ForgeRenderLayer extends RenderLayer {
     this.context = context;
     this.clearStrategy = clearStrategy;
   }
+
+  public override resize(width: number, height: number): void {
+    super.resize(width, height);
+
+    this.context.viewport(0, 0, width, height);
+  }
 }
