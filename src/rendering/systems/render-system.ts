@@ -249,7 +249,5 @@ export class RenderSystem extends System {
 
   public override stop(): void {
     this._layer.context.clear(this._layer.context.COLOR_BUFFER_BIT);
-
-    console.log('stoooping render sys');
   }
 }
