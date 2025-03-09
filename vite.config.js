@@ -19,6 +19,7 @@ export default defineConfig({
   test: {
     include: ['src/**/*.test.ts'],
     environment: 'jsdom',
+    setupFiles: ['setup-tests.ts'],
   },
   plugins: [dts({ tsconfigPath: './tsconfig.json', rollupTypes: true })],
 });

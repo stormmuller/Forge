@@ -11,17 +11,22 @@ export class ForgeRenderLayer extends RenderLayer {
   /** The strategy for clearing the render layer. */
   public clearStrategy: CLEAR_STRATEGY_KEYS;
 
+  /** Whether to sort entities by their y position before rendering. */
+  public sortEntities: boolean;
+
   /**
    * Constructs a new instance of the `ForgeRenderLayer` class.
    * @param name - The name of the render layer.
    * @param canvas - The canvas element associated with the render layer.
    * @param clearStrategy - The strategy for clearing the render layer (default: CLEAR_STRATEGY.blank).
+   * @param sortEntities - Whether to sort entities by their y position before rendering (default: false).
    * @throws An error if the WebGL2 context is not found.
    */
   constructor(
     name: string,
     canvas: HTMLCanvasElement,
     clearStrategy: CLEAR_STRATEGY_KEYS = CLEAR_STRATEGY.blank,
+    sortEntities = false,
   ) {
     super(name, canvas);
 
@@ -33,6 +38,7 @@ export class ForgeRenderLayer extends RenderLayer {
 
     this.context = context;
     this.clearStrategy = clearStrategy;
+    this.sortEntities = sortEntities;
   }
 
   public override resize(width: number, height: number): void {

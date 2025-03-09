@@ -20,7 +20,6 @@ describe('RiveCache', () => {
   let riveCache: RiveCache;
 
   beforeEach(() => {
-    vi.clearAllMocks();
     riveCache = new RiveCache();
   });
 
