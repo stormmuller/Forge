@@ -35,6 +35,8 @@ export interface RenderSystemOptions {
 export class RenderSystem extends System {
   private _layer: ForgeRenderLayer;
   private _program: WebGLProgram;
+  private _uTextureLoc: WebGLUniformLocation | null;
+  private _uMatrixLoc: WebGLUniformLocation | null;
 
   /**
    * Constructs a new instance of the `RenderSystem` class.
@@ -71,6 +73,16 @@ export class RenderSystem extends System {
       program ??
       createProgram(layer.context, spriteVertexShader, spriteFragmentShader);
 
+    this._uMatrixLoc = this._layer.context.getUniformLocation(
+      this._program,
+      'u_matrix',
+    );
+
+    this._uTextureLoc = this._layer.context.getUniformLocation(
+      this._program,
+      'u_texture',
+    );
+
     const { context } = this._layer;
 
     context.useProgram(this._program);
@@ -89,31 +101,11 @@ export class RenderSystem extends System {
   public override beforeAll(entities: Entity[]) {
     this._layer.context.clear(this._layer.context.COLOR_BUFFER_BIT);
 
-    const sortedEntities = entities.sort((entity1, entity2) => {
-      const position1 = entity1.getComponentRequired<PositionComponent>(
-        PositionComponent.symbol,
-      );
+    if (!this._layer.sortEntities) {
+      return entities;
+    }
 
-      const spriteComponent1 = entity1.getComponentRequired<SpriteComponent>(
-        SpriteComponent.symbol,
-      );
-
-      const position2 = entity2.getComponentRequired<PositionComponent>(
-        PositionComponent.symbol,
-      );
-
-      const spriteComponent2 = entity2.getComponentRequired<SpriteComponent>(
-        SpriteComponent.symbol,
-      );
-
-      return (
-        position1.y -
-        spriteComponent1.sprite.pivot.y -
-        (position2.y - spriteComponent2.sprite.pivot.y)
-      );
-    });
-
-    return sortedEntities;
+    return this._sortEntities(entities);
   }
 
   /**
@@ -143,23 +135,13 @@ export class RenderSystem extends System {
       RotationComponent.symbol,
     );
 
-    const uMatrixLoc = this._layer.context.getUniformLocation(
-      this._program,
-      'u_matrix',
-    );
-
     this._layer.context.activeTexture(this._layer.context.TEXTURE0);
     this._layer.context.bindTexture(
       this._layer.context.TEXTURE_2D,
       spriteComponent.sprite.texture,
     );
 
-    // Set u_texture uniform to texture unit 0
-    const uTextureLoc = this._layer.context.getUniformLocation(
-      this._program,
-      'u_texture',
-    );
-    this._layer.context.uniform1i(uTextureLoc, 0);
+    this._layer.context.uniform1i(this._uTextureLoc, 0);
 
     // Compute transformation matrix
     const mat = this._getSpriteMatrix(
@@ -172,7 +154,7 @@ export class RenderSystem extends System {
     );
 
     // Send it to the GPU
-    this._layer.context.uniformMatrix3fv(uMatrixLoc, false, mat.data);
+    this._layer.context.uniformMatrix3fv(this._uMatrixLoc, false, mat.data);
 
     // Draw the quad (two triangles, 6 vertices)
     this._layer.context.drawArrays(this._layer.context.TRIANGLES, 0, 6);
@@ -245,6 +227,32 @@ export class RenderSystem extends System {
       .translate(-pivot.x, -pivot.y);
 
     return matrix;
+  }
+
+  private _sortEntities(entities: Entity[]) {
+    return entities.sort((entity1, entity2) => {
+      const position1 = entity1.getComponentRequired<PositionComponent>(
+        PositionComponent.symbol,
+      );
+
+      const spriteComponent1 = entity1.getComponentRequired<SpriteComponent>(
+        SpriteComponent.symbol,
+      );
+
+      const position2 = entity2.getComponentRequired<PositionComponent>(
+        PositionComponent.symbol,
+      );
+
+      const spriteComponent2 = entity2.getComponentRequired<SpriteComponent>(
+        SpriteComponent.symbol,
+      );
+
+      return (
+        position1.y -
+        spriteComponent1.sprite.pivot.y -
+        (position2.y - spriteComponent2.sprite.pivot.y)
+      );
+    });
   }
 
   public override stop(): void {

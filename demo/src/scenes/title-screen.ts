@@ -4,9 +4,9 @@ import { createStarfield } from '../create-starfield';
 import { StarfieldSystem } from '../starfield';
 import { createShipPilotScene } from './ship-pilot';
 
-const riveFileUri = 'TitleScreen.riv';
+const riveFileUri = 'ui.riv';
 const riveStateMachine = 'Button';
-const riveStartOnClickedEventName = 'OnClickButton';
+const riveStartOnClickedEventName = 'OnClick';
 
 export async function createTitleScene(
   game: forge.Game,
@@ -67,8 +67,11 @@ export async function createTitleScene(
     onStartClickedEvent,
   );
 
-  onStartClickedEvent.registerListener(async (payload) => {
-    console.log('Start clicked', payload);
+  layerService.registerLayer(riveRenderLayer);
+
+  onStartClickedEvent.registerListener(async () => {
+    console.log('Start clicked');
+
     game.registerScene(
       await createShipPilotScene(game, gameContainer, imageCache),
     );
