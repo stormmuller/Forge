@@ -6,7 +6,7 @@ import { createShipPilotScene } from './ship-pilot';
 
 const riveFileUri = 'ui.riv';
 const riveStateMachine = 'Button';
-const riveStartOnClickedEventName = 'OnClickButton';
+const riveStartOnClickedEventName = 'OnClick';
 
 export async function createTitleScene(
   game: forge.Game,
@@ -70,6 +70,8 @@ export async function createTitleScene(
   layerService.registerLayer(riveRenderLayer);
 
   onStartClickedEvent.registerListener(async () => {
+    console.log('Start clicked');
+
     game.registerScene(
       await createShipPilotScene(game, gameContainer, imageCache),
     );
