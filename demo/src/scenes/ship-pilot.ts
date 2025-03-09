@@ -40,16 +40,26 @@ export async function createShipPilotScene(
     layerService,
     world,
     cameraEntity,
+    false,
+  );
+
+  const backgroundRenderLayer = addRenderLayer(
+    forge.DEFAULT_LAYERS.background,
+    gameContainer,
+    layerService,
+    world,
+    cameraEntity,
+    false,
   );
 
   await createShip(imageCache, foregroundRenderLayer, world);
-  createStarfield(world, 100);
+  createStarfield(world, 500);
 
   const shipMovementSystem = new ShipMovementSystem(inputsEntity, game.time);
   const starfieldSystem = new StarfieldSystem(
     world,
     imageCache,
-    foregroundRenderLayer,
+    backgroundRenderLayer,
   );
   const animationSystem = new forge.AnimationSystem(game.time);
 
@@ -72,9 +82,15 @@ function addRenderLayer(
   layerService: forge.LayerService,
   world: forge.World,
   cameraEntity: forge.Entity,
+  sortEntities: boolean,
 ) {
   const canvas = forge.createCanvas(`$forge-layer-${layerName}`, gameContainer);
-  const layer = new forge.ForgeRenderLayer(layerName, canvas);
+  const layer = new forge.ForgeRenderLayer(
+    layerName,
+    canvas,
+    forge.CLEAR_STRATEGY.blank,
+    sortEntities,
+  );
 
   layerService.registerLayer(layer);
 
