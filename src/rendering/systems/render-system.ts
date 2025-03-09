@@ -1,14 +1,14 @@
-import {
-  isNil,
-  PositionComponent,
-  RotationComponent,
-  ScaleComponent,
-} from '../../common';
+import { isNil, PositionComponent } from '../../common';
 import { Entity, System } from '../../ecs';
-import { CameraComponent, SpriteComponent } from '../components';
+import {
+  CameraComponent,
+  SpriteBatchComponent,
+  SpriteComponent,
+} from '../components';
 import { createProjectionMatrix } from '../shaders/utils/create-projection-matrix';
 import { Matrix3x3, Vector2 } from '../../math';
 import {
+  bindTextureToUniform,
   createProgram,
   spriteFragmentShader,
   spriteVertexShader,
@@ -29,21 +29,24 @@ export interface RenderSystemOptions {
   program?: WebGLProgram;
 }
 
+const FLOATS_PER_MATRIX = 9;
+
 /**
  * The `RenderSystem` class extends the `System` class and manages the rendering of sprites.
  */
 export class RenderSystem extends System {
   private _layer: ForgeRenderLayer;
   private _program: WebGLProgram;
-  private _uTextureLoc: WebGLUniformLocation | null;
-  private _uMatrixLoc: WebGLUniformLocation | null;
+  private _uTextureLoc: WebGLUniformLocation;
+  private _matrixLocation: number;
+  private _instanceBuffer: WebGLBuffer;
 
   /**
    * Constructs a new instance of the `RenderSystem` class.
    * @param options - The options for configuring the render system.
    */
   constructor(options: RenderSystemOptions) {
-    super('renderer', [PositionComponent.symbol, SpriteComponent.symbol]);
+    super('renderer', [SpriteBatchComponent.symbol]);
 
     const { layer, cameraEntity, program } = options;
 
@@ -73,15 +76,17 @@ export class RenderSystem extends System {
       program ??
       createProgram(layer.context, spriteVertexShader, spriteFragmentShader);
 
-    this._uMatrixLoc = this._layer.context.getUniformLocation(
-      this._program,
-      'u_matrix',
-    );
-
     this._uTextureLoc = this._layer.context.getUniformLocation(
       this._program,
       'u_texture',
+    )!; // TODO: handle null
+
+    this._matrixLocation = this._layer.context.getAttribLocation(
+      this._program,
+      'a_instanceMatrix',
     );
+
+    this._instanceBuffer = this._layer.context.createBuffer();
 
     const { context } = this._layer;
 
@@ -101,11 +106,7 @@ export class RenderSystem extends System {
   public override beforeAll(entities: Entity[]) {
     this._layer.context.clear(this._layer.context.COLOR_BUFFER_BIT);
 
-    if (!this._layer.sortEntities) {
-      return entities;
-    }
-
-    return this._sortEntities(entities);
+    return entities;
   }
 
   /**
@@ -113,51 +114,77 @@ export class RenderSystem extends System {
    * @param entity - The entity that contains the `SpriteComponent` and `PositionComponent`.
    */
   public async run(entity: Entity): Promise<void> {
-    const spriteComponent = entity.getComponentRequired<SpriteComponent>(
-      SpriteComponent.symbol,
-    );
+    const spriteBatchComponent =
+      entity.getComponentRequired<SpriteBatchComponent>(
+        SpriteBatchComponent.symbol,
+      );
 
-    if (spriteComponent.sprite.renderLayer !== this._layer) {
-      return; // Probably not the best way to handle layers/sprite, but the alternatives have their own issues.
+    for (const [sprite, batch] of spriteBatchComponent.batches) {
+      const instanceData = new Float32Array(batch.length * FLOATS_PER_MATRIX);
+
+      for (let instanceId = 0; instanceId < batch.length; instanceId++) {
+        const { position, rotation, scale, sprite } = batch[instanceId]!;
+
+        const mat = this._getSpriteMatrix(
+          position,
+          rotation,
+          sprite.width,
+          sprite.height,
+          scale,
+          sprite.pivot,
+        );
+
+        for (let row = 0; row < mat.matrix.length; row++) {
+          instanceData[instanceId * mat.matrix.length + row] = mat.matrix[row]!;
+        }
+      }
+
+      this._layer.context.bindBuffer(
+        this._layer.context.ARRAY_BUFFER,
+        this._instanceBuffer,
+      );
+      this._layer.context.bufferData(
+        this._layer.context.ARRAY_BUFFER,
+        instanceData,
+        this._layer.context.DYNAMIC_DRAW,
+      );
+
+      // Each column is a vec3, so "size" = 3, "stride" = 9 floats * 4 bytes = 36
+      // and the offset for each column is 0, 3, and 6 floats * 4 bytes.
+      for (let column = 0; column < 3; column++) {
+        const attribLoc = this._matrixLocation + column;
+        this._layer.context.enableVertexAttribArray(attribLoc);
+
+        // We skip 'column * 3' floats for each column
+        const offsetInBytes = column * 3 * 4;
+
+        this._layer.context.vertexAttribPointer(
+          attribLoc,
+          3, // each column is 3 floats
+          this._layer.context.FLOAT, // type
+          false, // normalized
+          9 * 4, // stride in bytes (9 floats total for each matrix)
+          offsetInBytes, // offset in bytes to this column
+        );
+
+        // Now set the divisor so it advances once per instance
+        this._layer.context.vertexAttribDivisor(attribLoc, 1);
+      }
+
+      bindTextureToUniform(
+        this._layer.context,
+        sprite.texture,
+        this._uTextureLoc,
+        0,
+      );
+
+      this._layer.context.drawArraysInstanced(
+        this._layer.context.TRIANGLES,
+        0, // offset
+        6,
+        batch.length, // number of instances
+      );
     }
-
-    if (!spriteComponent.enabled) {
-      return;
-    }
-
-    const position = entity.getComponentRequired<PositionComponent>(
-      PositionComponent.symbol,
-    );
-
-    const scale = entity.getComponent<ScaleComponent>(ScaleComponent.symbol);
-
-    const rotation = entity.getComponent<RotationComponent>(
-      RotationComponent.symbol,
-    );
-
-    this._layer.context.activeTexture(this._layer.context.TEXTURE0);
-    this._layer.context.bindTexture(
-      this._layer.context.TEXTURE_2D,
-      spriteComponent.sprite.texture,
-    );
-
-    this._layer.context.uniform1i(this._uTextureLoc, 0);
-
-    // Compute transformation matrix
-    const mat = this._getSpriteMatrix(
-      position,
-      rotation?.radians ?? 0,
-      spriteComponent.sprite.width,
-      spriteComponent.sprite.height,
-      scale ?? Vector2.one,
-      spriteComponent.sprite.pivot,
-    );
-
-    // Send it to the GPU
-    this._layer.context.uniformMatrix3fv(this._uMatrixLoc, false, mat.data);
-
-    // Draw the quad (two triangles, 6 vertices)
-    this._layer.context.drawArrays(this._layer.context.TRIANGLES, 0, 6);
   }
 
   /**

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RenderSystem, RenderSystemOptions } from './render-system';
 import { Entity } from '../../ecs';
@@ -11,7 +12,6 @@ import { Vector2 } from '../../math';
 import { ForgeRenderLayer } from '../render-layers';
 
 describe('RenderSystem', () => {
-  let renderLayer: ForgeRenderLayer;
   let cameraEntity: Entity;
   let renderSystem: RenderSystem;
   let entity: Entity;
@@ -19,42 +19,46 @@ describe('RenderSystem', () => {
   let spriteComponent: SpriteComponent;
   let cameraComponent: CameraComponent;
 
+  const renderLayer = {
+    context: {
+      useProgram: vi.fn(),
+      enable: vi.fn(),
+      blendFunc: vi.fn(),
+      clear: vi.fn(),
+      getUniformLocation: vi.fn(),
+      activeTexture: vi.fn(),
+      bindTexture: vi.fn(),
+      uniform1i: vi.fn(),
+      uniformMatrix3fv: vi.fn(),
+      drawArrays: vi.fn(),
+      createBuffer: vi.fn(),
+      bindBuffer: vi.fn(),
+      bufferData: vi.fn(),
+      getAttribLocation: vi.fn(),
+      enableVertexAttribArray: vi.fn(),
+      vertexAttribPointer: vi.fn(),
+      createShader: vi.fn(() => shader),
+      shaderSource: vi.fn(),
+      compileShader: vi.fn(),
+      getShaderParameter: vi.fn(() => ({})),
+      createProgram: vi.fn(() => ({})),
+      attachShader: vi.fn(),
+      linkProgram: vi.fn(),
+      getProgramParameter: vi.fn(() => ({})),
+      COLOR_BUFFER_BIT: 1,
+      TEXTURE0: 2,
+      TEXTURE_2D: 3,
+      TRIANGLES: 4,
+    },
+    canvas: {
+      width: 800,
+      height: 600,
+    },
+  };
+
   const shader = {};
 
   beforeEach(() => {
-    renderLayer = {
-      context: {
-        useProgram: vi.fn(),
-        enable: vi.fn(),
-        blendFunc: vi.fn(),
-        clear: vi.fn(),
-        getUniformLocation: vi.fn(),
-        activeTexture: vi.fn(),
-        bindTexture: vi.fn(),
-        uniform1i: vi.fn(),
-        uniformMatrix3fv: vi.fn(),
-        drawArrays: vi.fn(),
-        createBuffer: vi.fn(),
-        bindBuffer: vi.fn(),
-        bufferData: vi.fn(),
-        getAttribLocation: vi.fn(),
-        enableVertexAttribArray: vi.fn(),
-        vertexAttribPointer: vi.fn(),
-        createShader: vi.fn(() => shader),
-        shaderSource: vi.fn(),
-        compileShader: vi.fn(),
-        getShaderParameter: vi.fn(() => ({})),
-        createProgram: vi.fn(() => ({})),
-        attachShader: vi.fn(),
-        linkProgram: vi.fn(),
-        getProgramParameter: vi.fn(() => ({})),
-      },
-      canvas: {
-        width: 800,
-        height: 600,
-      },
-    } as unknown as ForgeRenderLayer;
-
     cameraComponent = {
       isStatic: false,
       allowZooming: true,
@@ -74,7 +78,7 @@ describe('RenderSystem', () => {
     spriteComponent = {
       enabled: true,
       sprite: {
-        renderLayer: renderLayer,
+        renderLayer: renderLayer as unknown as ForgeRenderLayer,
         texture: {} as WebGLTexture,
         width: 100,
         height: 100,
@@ -101,7 +105,7 @@ describe('RenderSystem', () => {
     } as unknown as Entity;
 
     const options: RenderSystemOptions = {
-      layer: renderLayer,
+      layer: renderLayer as unknown as ForgeRenderLayer,
       cameraEntity: cameraEntity,
     };
 
@@ -120,6 +124,7 @@ describe('RenderSystem', () => {
   });
 
   it('should render the sprite for the given entity', async () => {
+    renderLayer.context.getUniformLocation.mockReturnValue(() => ({}));
     await renderSystem.run(entity);
 
     expect(renderLayer.context.activeTexture).toHaveBeenCalledWith(
