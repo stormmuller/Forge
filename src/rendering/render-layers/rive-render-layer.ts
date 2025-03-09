@@ -86,7 +86,7 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
       canvas,
       stateMachines: stateMachines,
       layout: new Layout({
-        fit: Fit.FitWidth,
+        fit: Fit.Layout,
         alignment: Alignment.Center,
       }),
       autoplay: true,
