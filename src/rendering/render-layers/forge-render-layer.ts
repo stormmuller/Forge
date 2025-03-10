@@ -39,6 +39,8 @@ export class ForgeRenderLayer extends RenderLayer {
     this.context = context;
     this.clearStrategy = clearStrategy;
     this.sortEntities = sortEntities;
+
+    this.context.viewport(0, 0, canvas.width, canvas.height);
   }
 
   public override resize(width: number, height: number): void {

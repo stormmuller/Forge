@@ -21,7 +21,7 @@ export class ShipMovementSystem extends forge.System {
     this._time = time;
   }
 
-  public async run(entity: forge.Entity): Promise<void>  {
+  public async run(entity: forge.Entity): Promise<void> {
     const player = entity.getComponentRequired<ShipComponent>(
       ShipComponent.symbol,
     );
@@ -39,22 +39,22 @@ export class ShipMovementSystem extends forge.System {
       -Math.cos(rotation.radians),
     );
 
-    if (this._inputComponent.keyPressed(forge.keyCodes.w)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.arrowUp)) {
       position.x += forwardVector.x * player.speed * this._time.deltaTime;
       position.y += forwardVector.y * player.speed * this._time.deltaTime;
     }
 
-    if (this._inputComponent.keyPressed(forge.keyCodes.s)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.arrowDown)) {
       position.x -= forwardVector.x * player.speed * this._time.deltaTime;
       position.y -= forwardVector.y * player.speed * this._time.deltaTime;
     }
 
-    if (this._inputComponent.keyPressed(forge.keyCodes.a)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.arrowLeft)) {
       rotation.radians -= (player.rotationSpeed / 100) * this._time.deltaTime;
     }
 
-    if (this._inputComponent.keyPressed(forge.keyCodes.d)) {
+    if (this._inputComponent.keyPressed(forge.keyCodes.arrowRight)) {
       rotation.radians += (player.rotationSpeed / 100) * this._time.deltaTime;
     }
-  };
+  }
 }

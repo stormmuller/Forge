@@ -36,7 +36,7 @@ export async function createTitleScene(
 
   const cameraEntity = new forge.Entity('world camera', [
     new forge.CameraComponent({ allowZooming: false, allowPanning: false }),
-    new forge.PositionComponent(worldSpace.center.x, worldSpace.center.y),
+    new forge.PositionComponent(0, 0),
   ]);
 
   const foregroundRenderLayer = addRenderLayer(
@@ -47,7 +47,7 @@ export async function createTitleScene(
     cameraEntity,
   );
 
-  createStarfield(world, 200);
+  createStarfield(world, 200, worldSpace);
 
   const riveFile = await riveCache.getOrLoad(riveFileUri);
 
@@ -70,8 +70,6 @@ export async function createTitleScene(
   layerService.registerLayer(riveRenderLayer);
 
   onStartClickedEvent.registerListener(async () => {
-    console.log('Start clicked');
-
     game.registerScene(
       await createShipPilotScene(game, gameContainer, imageCache),
     );
@@ -79,11 +77,14 @@ export async function createTitleScene(
     game.deregisterScene(scene);
   });
 
-  const starfieldSystem = new StarfieldSystem(
-    world,
-    imageCache,
-    foregroundRenderLayer,
-  );
+  const image = await imageCache.getOrLoad('star_small.png');
+
+  const sprite = new forge.Sprite({
+    image,
+    renderLayer: foregroundRenderLayer,
+  });
+
+  const starfieldSystem = new StarfieldSystem(world, sprite);
   const animationSystem = new forge.AnimationSystem(game.time);
 
   world.addSystems([starfieldSystem, animationSystem]);
@@ -118,6 +119,15 @@ function addRenderLayer(
   });
 
   world.addSystem(layerRenderSystem);
+
+  const spriteBatcher = new forge.Entity('sprite batcher', [
+    new forge.SpriteBatchComponent(),
+  ]);
+
+  const batchingSystem = new forge.SpriteBatchingSystem(spriteBatcher);
+
+  world.addEntity(spriteBatcher);
+  world.addSystem(batchingSystem);
 
   return layer;
 }

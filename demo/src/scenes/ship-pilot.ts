@@ -11,7 +11,10 @@ export async function createShipPilotScene(
 ) {
   const scene = new forge.Scene('ship-pilot');
 
-  const worldSpace = new forge.Space(window.innerWidth, window.innerHeight);
+  const worldSpace = new forge.Space(
+    window.innerWidth * 5,
+    window.innerHeight * 5,
+  );
   const layerService = new forge.LayerService();
 
   window.addEventListener('resize', () => {
@@ -30,18 +33,13 @@ export async function createShipPilotScene(
   world.addSystem(inputSystem);
 
   const cameraEntity = new forge.Entity('world camera', [
-    new forge.CameraComponent({ allowZooming: false, allowPanning: false }),
-    new forge.PositionComponent(worldSpace.center.x, worldSpace.center.y),
+    new forge.CameraComponent({
+      allowZooming: true,
+      allowPanning: true,
+      minZoom: 0.25,
+    }),
+    new forge.PositionComponent(0, 0),
   ]);
-
-  const foregroundRenderLayer = addRenderLayer(
-    forge.DEFAULT_LAYERS.foreground,
-    gameContainer,
-    layerService,
-    world,
-    cameraEntity,
-    false,
-  );
 
   const backgroundRenderLayer = addRenderLayer(
     forge.DEFAULT_LAYERS.background,
@@ -49,18 +47,36 @@ export async function createShipPilotScene(
     layerService,
     world,
     cameraEntity,
-    false,
   );
+
+  const foregroundRenderLayer = addRenderLayer(
+    forge.DEFAULT_LAYERS.foreground,
+    gameContainer,
+    layerService,
+    world,
+    cameraEntity,
+  );
+
+  const spriteBatcher = new forge.Entity('sprite batcher', [
+    new forge.SpriteBatchComponent(),
+  ]);
+
+  const batchingSystem = new forge.SpriteBatchingSystem(spriteBatcher);
+
+  world.addEntity(spriteBatcher);
 
   await createShip(imageCache, foregroundRenderLayer, world);
-  createStarfield(world, 500);
+  createStarfield(world, 20_000, worldSpace);
+
+  const image = await imageCache.getOrLoad('star_small.png');
+
+  const sprite = new forge.Sprite({
+    image,
+    renderLayer: backgroundRenderLayer,
+  });
 
   const shipMovementSystem = new ShipMovementSystem(inputsEntity, game.time);
-  const starfieldSystem = new StarfieldSystem(
-    world,
-    imageCache,
-    backgroundRenderLayer,
-  );
+  const starfieldSystem = new StarfieldSystem(world, sprite);
   const animationSystem = new forge.AnimationSystem(game.time);
 
   world.addSystems([shipMovementSystem, starfieldSystem, animationSystem]);
@@ -69,6 +85,7 @@ export async function createShipPilotScene(
 
   world.addEntity(cameraEntity);
   world.addSystem(cameraSystem);
+  world.addSystem(batchingSystem);
 
   scene.registerUpdatable(world);
   scene.registerStoppable(world);
@@ -82,15 +99,9 @@ function addRenderLayer(
   layerService: forge.LayerService,
   world: forge.World,
   cameraEntity: forge.Entity,
-  sortEntities: boolean,
 ) {
   const canvas = forge.createCanvas(`$forge-layer-${layerName}`, gameContainer);
-  const layer = new forge.ForgeRenderLayer(
-    layerName,
-    canvas,
-    forge.CLEAR_STRATEGY.blank,
-    sortEntities,
-  );
+  const layer = new forge.ForgeRenderLayer(layerName, canvas);
 
   layerService.registerLayer(layer);
 

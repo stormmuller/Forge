@@ -12,10 +12,7 @@ export const createShip = async (
     renderLayer,
   });
 
-  const positionComponent = new forge.PositionComponent(
-    window.innerWidth / 2,
-    window.innerHeight - 100,
-  );
+  const positionComponent = new forge.PositionComponent(0, 0);
 
   const scaleComponent = new forge.ScaleComponent();
 

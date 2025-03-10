@@ -164,14 +164,14 @@ export class Entity {
 export const filterEntitiesByComponents = (
   entities: Set<Entity>,
   componentSymbols: symbol[],
-): Entity[] => {
+): Set<Entity> => {
   // TODO: performance - cache these look ups if possible
 
-  const result: Entity[] = [];
+  const result = new Set<Entity>();
 
   for (const entity of entities) {
     if (entity.checkIfEntityContainsAllComponents(componentSymbols)) {
-      result.push(entity);
+      result.add(entity);
     }
   }
 

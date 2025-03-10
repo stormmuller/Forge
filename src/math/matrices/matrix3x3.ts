@@ -17,7 +17,7 @@ export class Matrix3x3 {
    */
   constructor(matrix: number[]) {
     if (matrix.length !== 9) {
-      throw new Error('Matrix3x3 requires 9 elements');
+      throw new Error('Matrix3x3 requires exactly 9 elements');
     }
 
     this._matrix = matrix;
