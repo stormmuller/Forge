@@ -303,19 +303,33 @@ export class RenderSystem extends System {
     scale: Vector2,
     pivot: Vector2,
   ): Matrix3x3 {
-    const matrix = createProjectionMatrix(
-      this._layer.canvas.width,
-      this._layer.canvas.height,
-    );
+    const { width, height } = this._layer.canvas;
+    const { x: camX, y: camY } = this._cameraPosition;
+    const zoom = this._camera.zoom;
 
-    matrix
-      .translate(
-        position.x + this._cameraPosition.x,
-        position.y + this._cameraPosition.y,
-      )
-      .rotate(rotation)
-      .scale(scale.x * spriteWidth, scale.y * spriteHeight)
-      .translate(-pivot.x, -pivot.y);
+    // Start with a standard projection:
+    const matrix = createProjectionMatrix(width, height);
+
+    // 1) Translate so screen center becomes the new origin
+    matrix.translate(width / 2, height / 2);
+
+    // 2) Scale around that center
+    matrix.scale(zoom, zoom);
+
+    // 3) Translate back so that (0, 0) again refers to the top-left corner,
+    //    but now any scaling has happened around the screen center
+    matrix.translate(-width / 2, -height / 2);
+
+    // 4) Apply camera offset (so that cameraPosition is centered on screen)
+    matrix.translate(camX + width / 2, camY + height / 2);
+
+    // 5) Now place this particular sprite
+    matrix.translate(position.x, position.y);
+    matrix.rotate(rotation);
+    matrix.scale(spriteWidth * scale.x, spriteHeight * scale.y);
+
+    // 6) Finally apply sprite pivot if needed
+    matrix.translate(-pivot.x, -pivot.y);
 
     return matrix;
   }

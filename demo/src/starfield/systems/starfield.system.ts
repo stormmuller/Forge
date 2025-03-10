@@ -33,8 +33,10 @@ export class StarfieldSystem extends forge.System {
     this._world.addEntity(
       new forge.Entity('star', [
         new forge.PositionComponent(
-          Math.random() * window.innerWidth - window.innerWidth / 2,
-          Math.random() * window.innerHeight - window.innerHeight / 2,
+          Math.random() * starfieldComponent.space.width -
+            starfieldComponent.space.width / 2,
+          Math.random() * starfieldComponent.space.height -
+            starfieldComponent.space.height / 2,
         ),
         scaleComponent,
         new forge.RotationComponent(0),

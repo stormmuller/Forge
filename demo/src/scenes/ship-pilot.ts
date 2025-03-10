@@ -11,7 +11,10 @@ export async function createShipPilotScene(
 ) {
   const scene = new forge.Scene('ship-pilot');
 
-  const worldSpace = new forge.Space(window.innerWidth, window.innerHeight);
+  const worldSpace = new forge.Space(
+    window.innerWidth * 5,
+    window.innerHeight * 5,
+  );
   const layerService = new forge.LayerService();
 
   window.addEventListener('resize', () => {
@@ -30,8 +33,12 @@ export async function createShipPilotScene(
   world.addSystem(inputSystem);
 
   const cameraEntity = new forge.Entity('world camera', [
-    new forge.CameraComponent({ allowZooming: false, allowPanning: true }),
-    new forge.PositionComponent(worldSpace.center.x, worldSpace.center.y),
+    new forge.CameraComponent({
+      allowZooming: true,
+      allowPanning: true,
+      minZoom: 0.25,
+    }),
+    new forge.PositionComponent(0, 0),
   ]);
 
   const backgroundRenderLayer = addRenderLayer(
@@ -59,7 +66,7 @@ export async function createShipPilotScene(
   world.addEntity(spriteBatcher);
 
   await createShip(imageCache, foregroundRenderLayer, world);
-  createStarfield(world, 20_000);
+  createStarfield(world, 20_000, worldSpace);
 
   const image = await imageCache.getOrLoad('star_small.png');
 
