@@ -11,7 +11,7 @@ export class World implements Updatable, Stoppable {
   /**
    * A map of system names to the entities they operate on.
    */
-  private _systemEntities = new Map<string, Entity[]>();
+  private _systemEntities = new Map<string, Set<Entity>>();
 
   /**
    * Callbacks to be invoked when systems change.
@@ -48,7 +48,13 @@ export class World implements Updatable, Stoppable {
         throw new Error(`Unable to get entities for system ${system.name}`);
       }
 
-      const enabledEntities = entities.filter((e) => e.enabled);
+      const enabledEntities = new Array<Entity>();
+
+      for (const entity of entities) {
+        if (entity.enabled) {
+          enabledEntities.push(entity);
+        }
+      }
 
       system.runSystem(enabledEntities);
     }
@@ -171,7 +177,7 @@ export class World implements Updatable, Stoppable {
           throw new Error(`Unable to get entities for system ${system.name}`);
         }
 
-        entities.push(entity);
+        entities.add(entity);
       }
     });
 

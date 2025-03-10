@@ -37,9 +37,7 @@
     "lint:fix": "eslint src --fix",
     "prettier": "prettier . --check",
     "prettier:write": "prettier . --write",
-    "prepare": "husky",
-    "demo:build": "tsc && vite build",
-    "demo:preview": "vite preview demo"
+    "prepare": "husky"
   },
   "author": "",
   "license": "MIT",

@@ -1,18 +1,18 @@
 import {
+  type OrNull,
   PositionComponent,
   RotationComponent,
   ScaleComponent,
 } from '../../common';
 import type { Component, Entity } from '../../ecs';
-import { Vector2 } from '../../math';
 import type { Sprite } from '../sprite';
 import { SpriteComponent } from './sprite-component';
 
 export interface Batchable {
   sprite: Sprite;
-  position: Vector2;
-  rotation: number;
-  scale: Vector2;
+  position: PositionComponent;
+  rotation: OrNull<RotationComponent>;
+  scale: OrNull<ScaleComponent>;
 }
 
 export type Batch = Batchable[];
@@ -66,17 +66,17 @@ export class SpriteBatchComponent implements Component {
       ScaleComponent.symbol,
     );
 
-    const batch = {
+    const batchable = {
       sprite: spriteComponent.sprite,
       position: positionComponent,
-      rotation: rotationComponent?.radians ?? 0,
-      scale: scaleComponent ?? Vector2.one,
+      rotation: rotationComponent,
+      scale: scaleComponent,
     };
 
     if (!this.batches.has(spriteComponent.sprite)) {
       this.batches.set(spriteComponent.sprite, []);
     }
 
-    this.batches.get(spriteComponent.sprite)!.push(batch);
+    this.batches.get(spriteComponent.sprite)!.push(batchable);
   }
 }

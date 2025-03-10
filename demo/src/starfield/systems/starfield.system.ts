@@ -3,21 +3,15 @@ import { StarfieldComponent } from '../components';
 
 export class StarfieldSystem extends forge.System {
   private _world: forge.World;
-  private _imageCache: forge.ImageCache;
-  private _renderLayer: forge.ForgeRenderLayer;
   private _random: forge.Random;
+  private _sprite: forge.Sprite;
 
-  constructor(
-    world: forge.World,
-    imageCache: forge.ImageCache,
-    renderLayer: forge.ForgeRenderLayer,
-  ) {
+  constructor(world: forge.World, sprite: forge.Sprite) {
     super('starfield', [StarfieldComponent.symbol]);
 
     this._world = world;
-    this._imageCache = imageCache;
-    this._renderLayer = renderLayer;
     this._random = new forge.Random('starfield');
+    this._sprite = sprite;
   }
 
   public async run(entity: forge.Entity): Promise<void> {
@@ -34,24 +28,17 @@ export class StarfieldSystem extends forge.System {
   }
 
   private async _createStar(starfieldComponent: StarfieldComponent) {
-    const image = await this._imageCache.getOrLoad('star_small.png');
-
-    const sprite = new forge.Sprite({
-      image,
-      renderLayer: this._renderLayer,
-    });
-
     const scaleComponent = new forge.ScaleComponent(0.5, 0.5);
 
     this._world.addEntity(
       new forge.Entity('star', [
         new forge.PositionComponent(
-          Math.random() * window.innerWidth,
-          Math.random() * window.innerHeight,
+          Math.random() * window.innerWidth - window.innerWidth / 2,
+          Math.random() * window.innerHeight - window.innerHeight / 2,
         ),
         scaleComponent,
         new forge.RotationComponent(0),
-        new forge.SpriteComponent(sprite),
+        new forge.SpriteComponent(this._sprite),
         new forge.AnimationComponent({
           duration: this._random.randomFloat(1000, 5000),
           updateCallback: (value: number) => {
