@@ -36,7 +36,7 @@ export async function createTitleScene(
 
   const cameraEntity = new forge.Entity('world camera', [
     new forge.CameraComponent({ allowZooming: false, allowPanning: false }),
-    new forge.PositionComponent(worldSpace.center.x, worldSpace.center.y),
+    new forge.PositionComponent(0, 0),
   ]);
 
   const foregroundRenderLayer = addRenderLayer(
@@ -47,7 +47,7 @@ export async function createTitleScene(
     cameraEntity,
   );
 
-  createStarfield(world, 15_000);
+  createStarfield(world, 200, worldSpace);
 
   const riveFile = await riveCache.getOrLoad(riveFileUri);
 
