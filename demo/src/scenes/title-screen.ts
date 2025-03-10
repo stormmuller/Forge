@@ -47,43 +47,44 @@ export async function createTitleScene(
     cameraEntity,
   );
 
-  createStarfield(world, 2000);
+  createStarfield(world, 15_000);
 
-  // const riveFile = await riveCache.getOrLoad(riveFileUri);
+  const riveFile = await riveCache.getOrLoad(riveFileUri);
 
-  // const riveRenderLayer = new forge.RiveRenderLayer(
-  //   forge.DEFAULT_LAYERS.ui,
-  //   forge.createCanvas(forge.DEFAULT_LAYERS.ui, gameContainer),
-  //   riveFile,
-  //   riveStateMachine,
-  // );
-
-  // const onStartClickedEvent = new forge.ParameterizedEvent<RiveEventPayload>(
-  //   `rive_${riveStartOnClickedEventName}`,
-  // );
-
-  // riveRenderLayer.registerRiveEvent(
-  //   riveStartOnClickedEventName,
-  //   onStartClickedEvent,
-  // );
-
-  // layerService.registerLayer(riveRenderLayer);
-
-  // onStartClickedEvent.registerListener(async () => {
-  //   console.log('Start clicked');
-
-  //   game.registerScene(
-  //     await createShipPilotScene(game, gameContainer, imageCache),
-  //   );
-
-  //   game.deregisterScene(scene);
-  // });
-
-  const starfieldSystem = new StarfieldSystem(
-    world,
-    imageCache,
-    foregroundRenderLayer,
+  const riveRenderLayer = new forge.RiveRenderLayer(
+    forge.DEFAULT_LAYERS.ui,
+    forge.createCanvas(forge.DEFAULT_LAYERS.ui, gameContainer),
+    riveFile,
+    riveStateMachine,
   );
+
+  const onStartClickedEvent = new forge.ParameterizedEvent<RiveEventPayload>(
+    `rive_${riveStartOnClickedEventName}`,
+  );
+
+  riveRenderLayer.registerRiveEvent(
+    riveStartOnClickedEventName,
+    onStartClickedEvent,
+  );
+
+  layerService.registerLayer(riveRenderLayer);
+
+  onStartClickedEvent.registerListener(async () => {
+    game.registerScene(
+      await createShipPilotScene(game, gameContainer, imageCache),
+    );
+
+    game.deregisterScene(scene);
+  });
+
+  const image = await imageCache.getOrLoad('star_small.png');
+
+  const sprite = new forge.Sprite({
+    image,
+    renderLayer: foregroundRenderLayer,
+  });
+
+  const starfieldSystem = new StarfieldSystem(world, sprite);
   const animationSystem = new forge.AnimationSystem(game.time);
 
   world.addSystems([starfieldSystem, animationSystem]);
@@ -95,7 +96,7 @@ export async function createTitleScene(
 
   scene.registerUpdatable(world);
   scene.registerStoppable(world);
-  // scene.registerStoppable(riveRenderLayer);
+  scene.registerStoppable(riveRenderLayer);
 
   return scene;
 }
