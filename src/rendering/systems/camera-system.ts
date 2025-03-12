@@ -67,11 +67,11 @@ export class CameraSystem extends System {
       }
 
       if (this._inputComponent.keyPressed(keyCodes.a)) {
-        position.x += zoomPanMultiplier;
+        position.x -= zoomPanMultiplier;
       }
 
       if (this._inputComponent.keyPressed(keyCodes.d)) {
-        position.x -= zoomPanMultiplier;
+        position.x += zoomPanMultiplier;
       }
     }
   }
