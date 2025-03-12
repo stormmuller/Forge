@@ -45,11 +45,11 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
     "@commitlint/cli": "^19.8.0",
-    "@commitlint/config-conventional": "^19.7.1",
+    "@commitlint/config-conventional": "^19.8.0",
     "@vitest/ui": "^3.0.8",
     "cspell": "^8.17.5",
-    "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.0.2",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-sort-exports": "^0.9.1",
     "husky": "^9.1.7",
@@ -57,11 +57,11 @@
     "prettier": "^3.5.3",
     "semantic-release": "^24.2.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.25.0",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1",
     "vite": "^6.2.1",
     "vite-plugin-dts": "^4.5.3",
-    "vitest": "^3.0.5"
+    "vitest": "^3.0.8"
   },
   "dependencies": {
     "@rive-app/canvas": "^2.26.4",
