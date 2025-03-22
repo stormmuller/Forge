@@ -1,12 +1,9 @@
 import {
-  Alignment,
   EventType,
-  Fit,
-  Layout,
   Rive,
   type RiveEventPayload,
   RiveEventType,
-  type RiveFile,
+  type RiveParameters,
 } from '@rive-app/canvas';
 import { RenderLayer } from './render-layer';
 import { EventDispatcher, ParameterizedEvent } from '../../events';
@@ -26,22 +23,17 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
    * Constructs a new instance of the `RiveRenderLayer` class.
    * @param name - The name of the render layer.
    * @param canvas - The canvas element associated with the render layer.
-   * @param riveFile - The Rive file associated with the render layer.
-   * @param stateMachines - The state machines to use in the Rive file (default: 'default').
+   * @param riveParameters - The Rive parameters to use. See https://rive.app/docs/runtimes/web/rive-parameters for more information.
    */
   constructor(
     name: string,
     canvas: HTMLCanvasElement,
-    riveFile: RiveFile,
-    stateMachines?: string[] | string,
+    riveParameters: RiveParameters,
   ) {
     super(name, canvas);
 
-    const { rive, riveEventDispatcher } = this._createRiveInstance(
-      riveFile,
-      canvas,
-      stateMachines,
-    );
+    const { rive, riveEventDispatcher } =
+      this._createRiveInstance(riveParameters);
 
     this.rive = rive;
     this._riveEventDispatcher = riveEventDispatcher;
@@ -71,29 +63,17 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
 
   /**
    * Creates a new Rive instance with the specified Rive file, canvas, and state machines.
-   * @param riveFile - The Rive file to use.
-   * @param canvas - The canvas element to associate with the Rive instance.
-   * @param stateMachines - The state machines to use in the Rive file (default: 'default').
+   * @param riveParameters - The Rive parameters to use. See https://rive.app/docs/runtimes/web/rive-parameters for more information.
    * @returns An object containing the Rive instance and event dispatcher.
    */
-  private _createRiveInstance(
-    riveFile: RiveFile,
-    canvas: HTMLCanvasElement,
-    stateMachines: string[] | string = 'default',
-  ) {
+  private _createRiveInstance(riveParameters: RiveParameters) {
     const rive = new Rive({
-      riveFile,
-      canvas,
-      stateMachines: stateMachines,
-      layout: new Layout({
-        fit: Fit.Layout,
-        alignment: Alignment.Center,
-      }),
       autoplay: true,
       onLoad: () => {
         // Prevent a blurry canvas by using the device pixel ratio
         rive.resizeDrawingSurfaceToCanvas();
       },
+      ...riveParameters,
     });
 
     const riveEventDispatcher = new EventDispatcher<RiveEventPayload>();
