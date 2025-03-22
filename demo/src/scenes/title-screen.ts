@@ -1,4 +1,4 @@
-import { RiveEventPayload } from '@rive-app/canvas';
+import { Alignment, Fit, Layout, RiveEventPayload } from '@rive-app/canvas';
 import * as forge from '../../../src';
 import { createStarfield } from '../create-starfield';
 import { StarfieldSystem } from '../starfield';
@@ -50,12 +50,20 @@ export async function createTitleScene(
   createStarfield(world, 200, worldSpace);
 
   const riveFile = await riveCache.getOrLoad(riveFileUri);
+  const riveCanvas = forge.createCanvas(forge.DEFAULT_LAYERS.ui, gameContainer);
 
   const riveRenderLayer = new forge.RiveRenderLayer(
     forge.DEFAULT_LAYERS.ui,
-    forge.createCanvas(forge.DEFAULT_LAYERS.ui, gameContainer),
-    riveFile,
-    riveStateMachine,
+    riveCanvas,
+    {
+      riveFile,
+      stateMachines: riveStateMachine,
+      canvas: riveCanvas,
+      layout: new Layout({
+        fit: Fit.Layout,
+        alignment: Alignment.Center,
+      }),
+    },
   );
 
   const onStartClickedEvent = new forge.ParameterizedEvent<RiveEventPayload>(

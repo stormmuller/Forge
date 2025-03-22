@@ -66,7 +66,7 @@ export async function createShipPilotScene(
   world.addEntity(spriteBatcher);
 
   await createShip(imageCache, foregroundRenderLayer, world);
-  createStarfield(world, 20_000, worldSpace);
+  createStarfield(world, 10_000, worldSpace);
 
   const image = await imageCache.getOrLoad('star_small.png');
 
