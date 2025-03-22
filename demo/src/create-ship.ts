@@ -6,7 +6,7 @@ export const createShip = async (
   renderLayer: forge.ForgeRenderLayer,
   world: forge.World,
 ) => {
-  const image = await imageCache.getOrLoad('ship_L.png');
+  const image = await imageCache.getOrLoad('ship.png');
   const shipSprite = new forge.Sprite({
     image,
     renderLayer,
