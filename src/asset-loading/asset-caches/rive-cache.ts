@@ -1,4 +1,4 @@
-import { RiveFile } from '@rive-app/canvas';
+import { RiveFile, type AssetLoadCallback } from '@rive-app/canvas';
 import type { AssetCache } from '../asset-cache';
 
 /**
@@ -29,7 +29,10 @@ export class RiveCache implements AssetCache<RiveFile> {
    * @returns A promise that resolves when the rive file is loaded and cached.
    * @throws Will throw an error if the rive file fails to load.
    */
-  public async load(path: string): Promise<void> {
+  public async load(
+    path: string,
+    assetLoader?: AssetLoadCallback,
+  ): Promise<void> {
     const file = new RiveFile({
       src: path,
       onLoad: () => {
@@ -38,6 +41,7 @@ export class RiveCache implements AssetCache<RiveFile> {
       onLoadError: (error) => {
         throw error;
       },
+      assetLoader,
     });
 
     return await file.init();
