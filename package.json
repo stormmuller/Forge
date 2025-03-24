@@ -42,10 +42,14 @@
   "author": "",
   "license": "MIT",
   "description": "",
+  "peerDependencies": {
+    "@rive-app/canvas": "^2.26.5"
+  },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
+    "@rive-app/canvas": "^2.26.5",
     "@vitest/ui": "^3.0.8",
     "cspell": "^8.17.5",
     "eslint": "^9.22.0",
@@ -64,7 +68,6 @@
     "vitest": "^3.0.8"
   },
   "dependencies": {
-    "@rive-app/canvas": "^2.26.4",
     "@types/howler": "^2.2.12",
     "@types/seedrandom": "^3.0.8",
     "howler": "^2.2.4",
