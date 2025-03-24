@@ -47,7 +47,7 @@ export async function createTitleScene(
     cameraEntity,
   );
 
-  createStarfield(world, 200, worldSpace);
+  createStarfield(world, 500, worldSpace);
 
   const riveFile = await riveCache.getOrLoad(riveFileUri);
   const riveCanvas = forge.createCanvas(forge.DEFAULT_LAYERS.ui, gameContainer);
