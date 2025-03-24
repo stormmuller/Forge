@@ -1,4 +1,4 @@
-import { RiveFile, type AssetLoadCallback } from '@rive-app/canvas';
+import { type AssetLoadCallback, RiveFile } from '@rive-app/canvas';
 import type { AssetCache } from '../asset-cache';
 
 /**
