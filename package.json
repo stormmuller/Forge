@@ -52,7 +52,7 @@
     "@rive-app/canvas": "^2.26.5",
     "@vitest/ui": "^3.0.8",
     "cspell": "^8.17.5",
-    "eslint": "^9.22.0",
+    "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-sort-exports": "^0.9.1",
