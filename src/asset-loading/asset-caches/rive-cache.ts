@@ -52,9 +52,12 @@ export class RiveCache implements AssetCache<RiveFile> {
    * @param path - The path of the rive file to retrieve or load.
    * @returns A promise that resolves to the rive file.
    */
-  public async getOrLoad(path: string): Promise<RiveFile> {
+  public async getOrLoad(
+    path: string,
+    assetLoader?: AssetLoadCallback,
+  ): Promise<RiveFile> {
     if (!this.assets.has(path)) {
-      await this.load(path);
+      await this.load(path, assetLoader);
     }
 
     return this.get(path);
