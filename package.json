@@ -65,7 +65,7 @@
     "typescript-eslint": "^8.26.1",
     "vite": "^6.2.2",
     "vite-plugin-dts": "^4.5.3",
-    "vitest": "^3.0.8"
+    "vitest": "^3.0.9"
   },
   "dependencies": {
     "@types/howler": "^2.2.12",
