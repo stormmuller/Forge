@@ -93,6 +93,9 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
     return { rive, riveEventDispatcher };
   }
 
+  /**
+   * Stops the render layer by clearing the canvas and cleaning up the Rive instance.
+   */
   public stop() {
     const gl =
       this.canvas.getContext('webgl2') || this.canvas.getContext('webgl');
@@ -107,5 +110,19 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
     }
 
     this.rive.cleanup();
+  }
+
+  /**
+   * Reloads the render layer with the specified Rive parameters.
+   * @param riveParameters - The Rive parameters to use. See https://rive.app/docs/runtimes/web/rive-parameters for more information.
+   */
+  public reload(riveParameters: RiveParameters) {
+    this.stop();
+
+    const { rive, riveEventDispatcher } =
+      this._createRiveInstance(riveParameters);
+
+    this.rive = rive;
+    this._riveEventDispatcher = riveEventDispatcher;
   }
 }
