@@ -1,18 +1,12 @@
-import {
-  Alignment,
-  Fit,
-  Layout,
-  Rive,
-  RiveEventPayload,
-} from '@rive-app/canvas';
+import { Alignment, Fit, Layout, RiveEventPayload } from '@rive-app/canvas';
 import * as forge from '../../../src';
 import { createStarfield } from '../create-starfield';
 import { StarfieldSystem } from '../starfield';
 import { createShipPilotScene } from './ship-pilot';
 
-const riveFileUri = 'demo.riv';
+const riveFileUri = 'ui.riv';
 const riveStateMachine = 'Button';
-const riveStartOnClickedEventName = 'OnPlayClicked';
+const riveStartOnClickedEventName = 'OnClick';
 
 export async function createTitleScene(
   game: forge.Game,
@@ -58,25 +52,18 @@ export async function createTitleScene(
   const riveFile = await riveCache.getOrLoad(riveFileUri);
   const riveCanvas = forge.createCanvas(forge.DEFAULT_LAYERS.ui, gameContainer);
 
-  const rive = new Rive({
-    riveFile,
-    autoplay: true,
-    stateMachines: riveStateMachine,
-    canvas: riveCanvas,
-    layout: new Layout({
-      fit: Fit.Layout,
-      alignment: Alignment.Center,
-    }),
-    onLoad: () => {
-      // Prevent a blurry canvas by using the device pixel ratio
-      rive.resizeDrawingSurfaceToCanvas();
-    },
-  });
-
   const riveRenderLayer = new forge.RiveRenderLayer(
     forge.DEFAULT_LAYERS.ui,
     riveCanvas,
-    rive,
+    {
+      riveFile,
+      stateMachines: riveStateMachine,
+      canvas: riveCanvas,
+      layout: new Layout({
+        fit: Fit.Layout,
+        alignment: Alignment.Center,
+      }),
+    },
   );
 
   const onStartClickedEvent = new forge.ParameterizedEvent<RiveEventPayload>(

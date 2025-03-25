@@ -3,6 +3,7 @@ import {
   Rive,
   type RiveEventPayload,
   RiveEventType,
+  type RiveParameters,
 } from '@rive-app/canvas';
 import { RenderLayer } from './render-layer';
 import { EventDispatcher, ParameterizedEvent } from '../../events';
@@ -22,13 +23,20 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
    * Constructs a new instance of the `RiveRenderLayer` class.
    * @param name - The name of the render layer.
    * @param canvas - The canvas element associated with the render layer.
-   * @param Rive - The Rive instance to use.
+   * @param riveParameters - The Rive parameters to use. See https://rive.app/docs/runtimes/web/rive-parameters for more information.
    */
-  constructor(name: string, canvas: HTMLCanvasElement, riveInstance: Rive) {
+  constructor(
+    name: string,
+    canvas: HTMLCanvasElement,
+    riveParameters: RiveParameters,
+  ) {
     super(name, canvas);
 
-    this.rive = riveInstance;
-    this._riveEventDispatcher = this._bindEventDispatcher(riveInstance);
+    const { rive, riveEventDispatcher } =
+      this._createRiveInstance(riveParameters);
+
+    this.rive = rive;
+    this._riveEventDispatcher = riveEventDispatcher;
   }
 
   /**
@@ -58,7 +66,16 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
    * @param riveParameters - The Rive parameters to use. See https://rive.app/docs/runtimes/web/rive-parameters for more information.
    * @returns An object containing the Rive instance and event dispatcher.
    */
-  private _bindEventDispatcher(rive: Rive): EventDispatcher<RiveEventPayload> {
+  private _createRiveInstance(riveParameters: RiveParameters) {
+    const rive = new Rive({
+      autoplay: true,
+      onLoad: () => {
+        // Prevent a blurry canvas by using the device pixel ratio
+        rive.resizeDrawingSurfaceToCanvas();
+      },
+      ...riveParameters,
+    });
+
     const riveEventDispatcher = new EventDispatcher<RiveEventPayload>();
 
     rive.on(EventType.RiveEvent, (event) => {
@@ -73,7 +90,7 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
       riveEventDispatcher.dispatchEvent(eventData.name, eventData);
     });
 
-    return riveEventDispatcher;
+    return { rive, riveEventDispatcher };
   }
 
   /**
