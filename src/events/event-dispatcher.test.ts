@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventDispatcher } from './event-dispatcher';
-import type { ParameterizedEvent } from './parameterized-event';
+import type { ParameterizedForgeEvent } from './parameterized-forge-event';
 
 describe('EventDispatcher', () => {
   let eventDispatcher: EventDispatcher<string>;
-  let mockEvent: ParameterizedEvent<string>;
+  let mockEvent: ParameterizedForgeEvent<string>;
 
   beforeEach(() => {
     eventDispatcher = new EventDispatcher<string>();
     mockEvent = {
       raise: vi.fn(),
-    } as unknown as ParameterizedEvent<string>;
+    } as unknown as ParameterizedForgeEvent<string>;
   });
 
   it('should add an event listener', () => {
@@ -46,7 +46,7 @@ describe('EventDispatcher', () => {
   it('should handle multiple listeners for the same event', () => {
     const mockEvent2 = {
       raise: vi.fn(),
-    } as unknown as ParameterizedEvent<string>;
+    } as unknown as ParameterizedForgeEvent<string>;
 
     eventDispatcher.addEventListener('test-event', mockEvent);
     eventDispatcher.addEventListener('test-event', mockEvent2);
