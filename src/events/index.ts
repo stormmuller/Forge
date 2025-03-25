@@ -1,3 +1,3 @@
-export * from './event';
-export * from './parameterized-event';
+export * from './forge-event';
+export * from './parameterized-forge-event';
 export * from './event-dispatcher';

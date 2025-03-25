@@ -1,5 +1,5 @@
 import { type Stoppable, Time } from '../common';
-import { Event } from '../events';
+import { ForgeEvent } from '../events';
 import { Scene } from './scene';
 
 /**
@@ -9,7 +9,7 @@ export class Game implements Stoppable {
   /**
    * Event triggered when the window is resized.
    */
-  public onWindowResize: Event;
+  public onWindowResize: ForgeEvent;
 
   /**
    * The current time instance.
@@ -27,7 +27,7 @@ export class Game implements Stoppable {
   constructor() {
     this._time = new Time();
     this._scenes = new Set<Scene>();
-    this.onWindowResize = new Event('window-resize');
+    this.onWindowResize = new ForgeEvent('window-resize');
 
     window.addEventListener('resize', () => {
       this.onWindowResize.raise();

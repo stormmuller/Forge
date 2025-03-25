@@ -1,4 +1,4 @@
-import { Event } from '../../events';
+import { ForgeEvent } from '../../events';
 import { Vector2 } from '../../math';
 
 /**
@@ -8,7 +8,7 @@ export class Space {
   /**
    * Event that is raised when the space changes.
    */
-  public onSpaceChange: Event;
+  public onSpaceChange: ForgeEvent;
 
   private _center: Vector2;
   private _width: number;
@@ -30,7 +30,7 @@ export class Space {
 
     this._center = new Vector2(this._width / 2, this._height / 2);
 
-    this.onSpaceChange = new Event('space-change');
+    this.onSpaceChange = new ForgeEvent('space-change');
   }
 
   /**

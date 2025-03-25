@@ -1,4 +1,4 @@
-import type { ParameterizedEvent } from './parameterized-event';
+import type { ParameterizedForgeEvent } from './parameterized-forge-event';
 
 /**
  * The `EventDispatcher` class is responsible for managing event listeners
@@ -11,7 +11,7 @@ export class EventDispatcher<TData> {
   /**
    * A map of event types to sets of event listeners.
    */
-  private _listeners: Map<string, Set<ParameterizedEvent<TData>>>;
+  private _listeners: Map<string, Set<ParameterizedForgeEvent<TData>>>;
 
   /**
    * Creates a new instance of the `EventDispatcher` class.
@@ -28,7 +28,7 @@ export class EventDispatcher<TData> {
    */
   public addEventListener(
     type: string,
-    event: ParameterizedEvent<TData>,
+    event: ParameterizedForgeEvent<TData>,
   ): void {
     if (!this._listeners.has(type)) {
       this._listeners.set(type, new Set());
@@ -45,7 +45,7 @@ export class EventDispatcher<TData> {
    */
   public removeEventListener(
     type: string,
-    event: ParameterizedEvent<TData>,
+    event: ParameterizedForgeEvent<TData>,
   ): void {
     this._listeners.get(type)?.delete(event);
   }
