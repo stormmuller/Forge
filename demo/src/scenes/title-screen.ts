@@ -66,9 +66,10 @@ export async function createTitleScene(
     },
   );
 
-  const onStartClickedEvent = new forge.ParameterizedEvent<RiveEventPayload>(
-    `rive_${riveStartOnClickedEventName}`,
-  );
+  const onStartClickedEvent =
+    new forge.ParameterizedForgeEvent<RiveEventPayload>(
+      `rive_${riveStartOnClickedEventName}`,
+    );
 
   riveRenderLayer.registerRiveEvent(
     riveStartOnClickedEventName,
