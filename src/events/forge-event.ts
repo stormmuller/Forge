@@ -3,7 +3,7 @@ type Listener = () => Promise<void>;
 /**
  * An event that can be raised and listened to.
  */
-export class Event {
+export class ForgeEvent {
   /**
    * The name of the event.
    */

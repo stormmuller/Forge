@@ -5,7 +5,7 @@ type Listener<T> = (eventData: T) => void;
  *
  * @template TInput - The type of the input parameter for the listeners.
  */
-export class ParameterizedEvent<TInput = null> {
+export class ParameterizedForgeEvent<TInput = null> {
   /**
    * The name of the event.
    */

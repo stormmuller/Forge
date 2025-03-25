@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { ParameterizedEvent } from './parameterized-event';
+import { ParameterizedForgeEvent } from './parameterized-forge-event';
 
 describe('When creating an event', () => {
-  const event = new ParameterizedEvent<string>('test-event');
+  const event = new ParameterizedForgeEvent<string>('test-event');
   const logic = vi.fn();
   const listener = async (data: string) => {
     logic(`processed ${data}`);

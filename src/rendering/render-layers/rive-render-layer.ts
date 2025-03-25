@@ -6,7 +6,7 @@ import {
   type RiveParameters,
 } from '@rive-app/canvas';
 import { RenderLayer } from './render-layer';
-import { EventDispatcher, ParameterizedEvent } from '../../events';
+import { EventDispatcher, ParameterizedForgeEvent } from '../../events';
 import type { Stoppable } from '../../common';
 
 /**
@@ -56,7 +56,7 @@ export class RiveRenderLayer extends RenderLayer implements Stoppable {
    */
   public registerRiveEvent(
     riveEventName: string,
-    event: ParameterizedEvent<RiveEventPayload>,
+    event: ParameterizedForgeEvent<RiveEventPayload>,
   ) {
     this._riveEventDispatcher.addEventListener(riveEventName, event);
   }

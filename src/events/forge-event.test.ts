@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { Event } from './event';
+import { ForgeEvent } from './forge-event';
 
 describe('When creating an event', () => {
-  const event = new Event('test-event');
+  const event = new ForgeEvent('test-event');
   const logic = vi.fn();
   const listener = async () => {
     logic('processed event');
