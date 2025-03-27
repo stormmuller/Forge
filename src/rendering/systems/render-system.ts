@@ -113,8 +113,6 @@ export class RenderSystem extends System {
         }
       }
 
-      // logVertexAttribs(gl, renderable.material.program);
-
       gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, batch.length);
     }
 
@@ -172,35 +170,5 @@ export class RenderSystem extends System {
     matrix.translate(-pivot.x, -pivot.y);
 
     return matrix;
-  }
-}
-
-function logVertexAttribs(gl: WebGL2RenderingContext, program: WebGLProgram) {
-  const numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
-  console.log(`Active attributes: ${numAttribs}`);
-
-  for (let i = 0; i < numAttribs; i++) {
-    const info = gl.getActiveAttrib(program, i);
-    if (!info) continue;
-
-    const loc = gl.getAttribLocation(program, info.name);
-    const isEnabled = gl.getVertexAttrib(loc, gl.VERTEX_ATTRIB_ARRAY_ENABLED);
-    const buffer = gl.getVertexAttrib(
-      loc,
-      gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
-    );
-    const divisor = gl.getVertexAttrib(loc, gl.VERTEX_ATTRIB_ARRAY_DIVISOR);
-
-    console.log(`Attribute: ${info.name}`);
-    console.log(`  Location: ${loc}`);
-    console.log(`  Enabled: ${isEnabled}`);
-    console.log(`  Buffer bound:`, buffer);
-    console.log(`  Divisor: ${divisor}`);
-
-    const offset = gl.getVertexAttribOffset(
-      loc,
-      gl.VERTEX_ATTRIB_ARRAY_POINTER,
-    );
-    console.log(`  Offset: ${offset}`);
   }
 }
