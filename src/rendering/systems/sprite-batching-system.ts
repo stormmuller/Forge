@@ -5,9 +5,9 @@ import {
 } from '../../common';
 import { Entity, System } from '../../ecs';
 import {
+  type Batchable,
   RenderableBatchComponent,
   SpriteComponent,
-  type Batchable,
 } from '../components';
 
 /**
