@@ -1,0 +1,126 @@
+type UniformValue = number | boolean | Float32Array | Int32Array | WebGLTexture;
+
+interface UniformSpec {
+  location: WebGLUniformLocation;
+  type: GLenum;
+}
+
+export class Material {
+  public readonly program: WebGLProgram;
+
+  private _uniforms: Map<string, UniformSpec> = new Map();
+  private _uniformValues: Map<string, UniformValue> = new Map();
+
+  constructor(
+    gl: WebGL2RenderingContext,
+    vertexSource: string,
+    fragmentSource: string,
+  ) {
+    this.program = this._createProgram(gl, vertexSource, fragmentSource);
+    this._detectUniforms(gl);
+  }
+
+  /**
+   * Sets a uniform value (number, vec2, matrix, texture, etc.).
+   */
+  public setUniform(name: string, value: UniformValue): void {
+    this._uniformValues.set(name, value);
+  }
+
+  /**
+   * Binds the material (program, uniforms, textures).
+   */
+  public bind(gl: WebGL2RenderingContext): void {
+    gl.useProgram(this.program);
+
+    let textureUnit = 0;
+
+    for (const [name, spec] of this._uniforms.entries()) {
+      const value = this._uniformValues.get(name);
+      if (value === undefined) continue;
+
+      const loc = spec.location;
+
+      if (value instanceof WebGLTexture) {
+        gl.activeTexture(gl.TEXTURE0 + textureUnit);
+        gl.bindTexture(gl.TEXTURE_2D, value);
+        gl.uniform1i(loc, textureUnit);
+        textureUnit++;
+      } else if (typeof value === 'number') {
+        gl.uniform1f(loc, value);
+      } else if (typeof value === 'boolean') {
+        gl.uniform1i(loc, value ? 1 : 0);
+      } else if (value instanceof Float32Array) {
+        if (value.length === 2) gl.uniform2fv(loc, value);
+        else if (value.length === 3) gl.uniform3fv(loc, value);
+        else if (value.length === 4) gl.uniform4fv(loc, value);
+        else if (value.length === 9) gl.uniformMatrix3fv(loc, false, value);
+        else if (value.length === 16) gl.uniformMatrix4fv(loc, false, value);
+      } else if (value instanceof Int32Array) {
+        gl.uniform1iv(loc, value);
+      }
+    }
+  }
+
+  private _createProgram(
+    gl: WebGL2RenderingContext,
+    vertexSrc: string,
+    fragmentSrc: string,
+  ): WebGLProgram {
+    const vertexShader = this._compileShader(gl, vertexSrc, gl.VERTEX_SHADER);
+    const fragmentShader = this._compileShader(
+      gl,
+      fragmentSrc,
+      gl.FRAGMENT_SHADER,
+    );
+
+    const program = gl.createProgram()!;
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      const log = gl.getProgramInfoLog(program);
+      throw new Error(`Failed to link program: ${log}`);
+    }
+
+    return program;
+  }
+
+  private _compileShader(
+    gl: WebGL2RenderingContext,
+    source: string,
+    type: GLenum,
+  ): WebGLShader {
+    const shader = gl.createShader(type)!;
+
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      const log = gl.getShaderInfoLog(shader);
+      throw new Error(`Shader compile error: ${log}`);
+    }
+
+    return shader;
+  }
+
+  private _detectUniforms(gl: WebGL2RenderingContext): void {
+    const program = this.program;
+
+    const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+
+    for (let i = 0; i < numUniforms; i++) {
+      const info = gl.getActiveUniform(program, i);
+      if (!info) continue;
+
+      const location = gl.getUniformLocation(program, info.name);
+      if (location !== null) {
+        this._uniforms.set(info.name, {
+          location,
+          type: info.type,
+        });
+      }
+    }
+  }
+}

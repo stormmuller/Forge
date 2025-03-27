@@ -7,9 +7,18 @@ export const createShip = async (
   world: forge.World,
 ) => {
   const image = await imageCache.getOrLoad('ship.png');
+
+  const material = new forge.SpriteMaterial(renderLayer.context, image);
+  const renderable = new forge.Renderable(
+    forge.createQuadGeometry(renderLayer.context),
+    material,
+  );
+
   const shipSprite = new forge.Sprite({
-    image,
+    renderable,
     renderLayer,
+    width: image.width,
+    height: image.height,
   });
 
   const positionComponent = new forge.PositionComponent(0, 0);

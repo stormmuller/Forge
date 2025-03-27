@@ -4,13 +4,17 @@ import {
   RotationComponent,
   ScaleComponent,
 } from '../../common';
-import type { Component, Entity } from '../../ecs';
-import type { Sprite } from '../sprite';
-import { SpriteComponent } from './sprite-component';
+import type { Component } from '../../ecs';
+import type { Vector2 } from '../../math';
+import type { RenderLayer } from '../render-layers';
+import type { Renderable } from '../renderable';
 
 export interface Batchable {
-  sprite: Sprite;
+  renderable: Renderable;
   position: PositionComponent;
+  width: number;
+  height: number;
+  pivot: Vector2;
   rotation: OrNull<RotationComponent>;
   scale: OrNull<ScaleComponent>;
 }
@@ -18,65 +22,27 @@ export interface Batchable {
 export type Batch = Batchable[];
 
 /**
- * The `SpriteComponent` class implements the `Component` interface and represents
- * a component that contains a `Sprite`.
+ * The `RenderableBatchComponent` class implements the `Component` interface and represents
+ * a component that contains a items that can be batched for rendering.
  */
-export class SpriteBatchComponent implements Component {
+export class RenderableBatchComponent implements Component {
   /** The name property holds the unique symbol for this component. */
   public name: symbol;
 
-  /** A static symbol property that uniquely identifies the `SpriteComponent`. */
-  public static symbol = Symbol('SpriteBatch');
+  /** A static symbol property that uniquely identifies the `RenderableBatchComponent`. */
+  public static symbol = Symbol('RenderableBatch');
 
   /** The map of batched entities. */
-  public batches: Map<Sprite, Batch> = new Map();
+  public batches: Map<Renderable, Batch> = new Map();
+
+  /** The render layer to which the batch belongs. */
+  public readonly renderLayer: RenderLayer;
 
   /**
-   * Constructs a new instance of the `SpriteComponent` class with the given `Sprite`.
-   * @param sprite - The `Sprite` instance to associate with this component.
-   * @param enabled - Indicates whether the sprite is enabled or not (default: true).
+   * Constructs a new instance of the `RenderableBatchComponent` class.
    */
-  constructor(entities: Entity[] = []) {
-    this.name = SpriteBatchComponent.symbol;
-
-    for (const entity of entities) {
-      this.add(entity);
-    }
-  }
-
-  /**
-   * Adds an entity to the batch.
-   * @param entity - The entity to add to the batch.
-   * TODO: move this logic into the batching system
-   * */
-  public add(entity: Entity): void {
-    const spriteComponent = entity.getComponentRequired<SpriteComponent>(
-      SpriteComponent.symbol,
-    );
-
-    const positionComponent = entity.getComponentRequired<PositionComponent>(
-      PositionComponent.symbol,
-    );
-
-    const rotationComponent = entity.getComponent<RotationComponent>(
-      RotationComponent.symbol,
-    );
-
-    const scaleComponent = entity.getComponent<ScaleComponent>(
-      ScaleComponent.symbol,
-    );
-
-    const batchable = {
-      sprite: spriteComponent.sprite,
-      position: positionComponent,
-      rotation: rotationComponent,
-      scale: scaleComponent,
-    };
-
-    if (!this.batches.has(spriteComponent.sprite)) {
-      this.batches.set(spriteComponent.sprite, []);
-    }
-
-    this.batches.get(spriteComponent.sprite)!.push(batchable);
+  constructor(renderLayer: RenderLayer) {
+    this.name = RenderableBatchComponent.symbol;
+    this.renderLayer = renderLayer;
   }
 }

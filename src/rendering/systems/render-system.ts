@@ -1,215 +1,124 @@
-import { isNil, PositionComponent } from '../../common';
+import { PositionComponent } from '../../common';
 import { Entity, System } from '../../ecs';
-import { CameraComponent, SpriteBatchComponent } from '../components';
-import { createProjectionMatrix } from '../shaders/utils/create-projection-matrix';
+import { RenderableBatchComponent } from '../components';
 import { Matrix3x3, Vector2 } from '../../math';
-import {
-  bindTextureToUniform,
-  createProgram,
-  spriteFragmentShader,
-  spriteVertexShader,
-} from '../shaders';
+import { createProjectionMatrix } from '../shaders/utils/create-projection-matrix';
+import { CameraComponent } from '../components';
 import type { ForgeRenderLayer } from '../render-layers';
 import type { Camera } from '../camera';
 
-/**
- * Options for configuring the `RenderSystem`.
- */
-export interface RenderSystemOptions {
-  /** The render layer to use for rendering. */
-  layer: ForgeRenderLayer;
-
-  /** The entity that contains the camera component. */
-  cameraEntity: Entity;
-
-  /** The WebGL program to use for rendering (optional). */
-  program?: WebGLProgram;
-}
-
 const FLOATS_PER_MATRIX = 9;
 
-/**
- * The `RenderSystem` class extends the `System` class and manages the rendering of sprites.
- */
+export interface RenderSystemOptions {
+  layer: ForgeRenderLayer;
+  cameraEntity: Entity;
+}
+
 export class RenderSystem extends System {
   private _layer: ForgeRenderLayer;
-  private _program: WebGLProgram;
-
-  private _uTextureLoc: WebGLUniformLocation;
-  private _matrixLocation: number;
-
+  private _camera: Camera;
+  private _cameraPosition: Vector2;
   private _instanceBuffer: WebGLBuffer;
 
-  // A single VAO storing all attribute pointer states
-  private _vao: WebGLVertexArrayObject;
-
-  private _cameraPosition: Vector2;
-  private _camera: Camera;
-
   constructor(options: RenderSystemOptions) {
-    super('renderer', [SpriteBatchComponent.symbol]);
+    super('renderer', [RenderableBatchComponent.symbol]);
 
-    const { layer, cameraEntity, program } = options;
+    const { layer, cameraEntity } = options;
     this._layer = layer;
 
     const cameraPosition = cameraEntity.getComponentRequired<PositionComponent>(
       PositionComponent.symbol,
     );
-    if (isNil(cameraPosition)) {
-      throw new Error(
-        `The 'camera' provided to the ${this.name} system during construction is missing the "${PositionComponent.name}" component`,
-      );
-    }
-    this._cameraPosition = cameraPosition;
-
     const camera = cameraEntity.getComponentRequired<CameraComponent>(
       CameraComponent.symbol,
     );
-    if (isNil(camera)) {
-      throw new Error(
-        `The 'camera' provided to the ${this.name} system during construction is missing the "${CameraComponent.name}" component`,
-      );
-    }
 
     this._camera = camera;
+    this._cameraPosition = cameraPosition;
 
-    this._program =
-      program ??
-      createProgram(layer.context, spriteVertexShader, spriteFragmentShader);
-
-    layer.context.useProgram(this._program);
-
-    this._uTextureLoc = layer.context.getUniformLocation(
-      this._program,
-      'u_texture',
-    )!; // TODO: handle null
-    this._matrixLocation = layer.context.getAttribLocation(
-      this._program,
-      'a_instanceMatrix',
-    );
-
-    this._vao = layer.context.createVertexArray() as WebGLVertexArrayObject;
-    layer.context.bindVertexArray(this._vao);
-
-    this._getSpriteBuffers(this._program);
-
-    this._instanceBuffer = layer.context.createBuffer() as WebGLBuffer;
-    layer.context.bindBuffer(layer.context.ARRAY_BUFFER, this._instanceBuffer);
-    // We won't upload data yet; just define the layout:
-
-    // Each mat3 is 3 "columns" of vec3 in column-major
-    // a_instanceMatrix consumes 3 consecutive attribute locations:
-    //   matrixLoc + 0, matrixLoc + 1, matrixLoc + 2
-    for (let column = 0; column < 3; column++) {
-      const attribLoc = this._matrixLocation + column;
-      layer.context.enableVertexAttribArray(attribLoc);
-
-      // offset for each column = column * 3 floats
-      const offsetInBytes = column * 3 * 4;
-      const strideInBytes = FLOATS_PER_MATRIX * 4; // 9 floats * 4 bytes
-
-      layer.context.vertexAttribPointer(
-        attribLoc,
-        3, // each column is a vec3
-        layer.context.FLOAT,
-        false,
-        strideInBytes,
-        offsetInBytes,
-      );
-
-      // We only advance to the next mat3 after each instance
-      layer.context.vertexAttribDivisor(attribLoc, 1);
-    }
-
-    // Unbind the VAO now that it's fully set up
-    layer.context.bindVertexArray(null);
-
-    // Enable blending
-    layer.context.enable(layer.context.BLEND);
-    layer.context.blendFunc(
-      layer.context.SRC_ALPHA,
-      layer.context.ONE_MINUS_SRC_ALPHA,
-    );
+    this._instanceBuffer = layer.context.createBuffer()!;
+    this._setupGLState();
   }
 
-  /**
-   * Prepares the render system before processing all entities.
-   * @param entities - The array of entities to process.
-   * @returns The sorted array of entities.
-   */
+  private _setupGLState(): void {
+    const gl = this._layer.context;
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  }
+
   public override beforeAll(entities: Entity[]) {
     this._layer.context.clear(this._layer.context.COLOR_BUFFER_BIT);
-
     return entities;
   }
 
-  /**
-   * Runs the render system for the given entity, rendering the sprite.
-   * @param entity - The entity that contains the `SpriteComponent` and `PositionComponent`.
-   */
-  public async run(entity: Entity): Promise<void> {
-    const spriteBatchComponent =
-      entity.getComponentRequired<SpriteBatchComponent>(
-        SpriteBatchComponent.symbol,
+  public override async run(entity: Entity): Promise<void> {
+    const batchComponent =
+      entity.getComponentRequired<RenderableBatchComponent>(
+        RenderableBatchComponent.symbol,
       );
 
-    // Bind the VAO once per "run" (once for each system tick)
-    this._layer.context.bindVertexArray(this._vao);
+    if (batchComponent.renderLayer !== this._layer) return;
 
-    for (const [sprite, batch] of spriteBatchComponent.batches) {
-      if (sprite.renderLayer !== this._layer) {
-        continue;
-      }
+    const gl = this._layer.context;
+
+    for (const [renderable, batch] of batchComponent.batches) {
+      if (batch.length === 0) continue;
+
+      renderable.bind(gl);
 
       const instanceData = new Float32Array(batch.length * FLOATS_PER_MATRIX);
 
-      for (let instanceId = 0; instanceId < batch.length; instanceId++) {
-        const { position, rotation, scale, sprite } = batch[instanceId]!;
+      for (let i = 0; i < batch.length; i++) {
+        const { position, rotation, scale, height, width, pivot } = batch[i]!;
 
         const mat = this._getSpriteMatrix(
           position,
           rotation?.radians ?? 0,
-          sprite.width,
-          sprite.height,
+          width,
+          height,
           scale ?? Vector2.one,
-          sprite.pivot,
+          pivot,
         );
 
-        // Copy mat into instanceData
-        // mat.matrix is a 9-element array in column-major
-        for (let i = 0; i < FLOATS_PER_MATRIX; i++) {
-          instanceData[instanceId * FLOATS_PER_MATRIX + i] = mat.matrix[i]!;
+        for (let j = 0; j < FLOATS_PER_MATRIX; j++) {
+          instanceData[i * FLOATS_PER_MATRIX + j] = mat.matrix[j]!;
         }
       }
 
-      this._layer.context.bindBuffer(
-        this._layer.context.ARRAY_BUFFER,
-        this._instanceBuffer,
-      );
+      // Upload instance transform buffer
+      gl.bindBuffer(gl.ARRAY_BUFFER, this._instanceBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, instanceData, gl.DYNAMIC_DRAW);
 
-      this._layer.context.bufferData(
-        this._layer.context.ARRAY_BUFFER,
-        instanceData,
-        this._layer.context.DYNAMIC_DRAW,
-      );
+      const program = renderable.material.program;
 
-      bindTextureToUniform(
-        this._layer.context,
-        sprite.texture,
-        this._uTextureLoc,
-        0,
-      );
+      const baseLocation = gl.getAttribLocation(program, 'a_instanceMatrix');
 
-      this._layer.context.drawArraysInstanced(
-        this._layer.context.TRIANGLES,
-        0,
-        6,
-        batch.length,
-      );
+      if (baseLocation === -1) {
+        console.error('a_instanceMatrix not found!');
+      } else {
+        for (let i = 0; i < 3; i++) {
+          const loc = baseLocation + i;
+
+          gl.enableVertexAttribArray(loc);
+          gl.bindBuffer(gl.ARRAY_BUFFER, this._instanceBuffer);
+          gl.vertexAttribPointer(
+            loc,
+            3,
+            gl.FLOAT,
+            false,
+            FLOATS_PER_MATRIX * 4,
+            i * 3 * 4,
+          );
+          gl.vertexAttribDivisor(loc, 1);
+        }
+      }
+
+      // logVertexAttribs(gl, renderable.material.program);
+
+      gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, batch.length);
     }
 
-    // Unbind VAO (optional; many engines just leave it bound)
-    this._layer.context.bindVertexArray(null);
+    gl.bindVertexArray(null);
   }
 
   /**
@@ -217,78 +126,6 @@ export class RenderSystem extends System {
    */
   public override stop(): void {
     this._layer.context.clear(this._layer.context.COLOR_BUFFER_BIT);
-  }
-
-  /**
-   * Creates the static quad geometry buffers (positions + tex coords)
-   * and configures them as vertex attributes. This is called while our VAO
-   * is bound, so these attribute settings are recorded in the VAO.
-   */
-  private _getSpriteBuffers(program: WebGLProgram) {
-    const positions = new Float32Array([
-      0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-
-      0.0, 1.0, 1.0, 0.0, 1.0, 1.0,
-    ]);
-
-    const texCoords = new Float32Array([
-      0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-
-      0.0, 1.0, 1.0, 0.0, 1.0, 1.0,
-    ]);
-
-    // Create + bind position buffer
-    const positionBuffer = this._layer.context.createBuffer();
-    this._layer.context.bindBuffer(
-      this._layer.context.ARRAY_BUFFER,
-      positionBuffer,
-    );
-    this._layer.context.bufferData(
-      this._layer.context.ARRAY_BUFFER,
-      positions,
-      this._layer.context.STATIC_DRAW,
-    );
-
-    const aPositionLoc = this._layer.context.getAttribLocation(
-      program,
-      'a_position',
-    );
-    this._layer.context.enableVertexAttribArray(aPositionLoc);
-    this._layer.context.enableVertexAttribArray(aPositionLoc);
-    this._layer.context.vertexAttribPointer(
-      aPositionLoc,
-      2,
-      this._layer.context.FLOAT,
-      false,
-      0,
-      0,
-    );
-
-    // Create + bind texCoord buffer
-    const texCoordBuffer = this._layer.context.createBuffer();
-    this._layer.context.bindBuffer(
-      this._layer.context.ARRAY_BUFFER,
-      texCoordBuffer,
-    );
-    this._layer.context.bufferData(
-      this._layer.context.ARRAY_BUFFER,
-      texCoords,
-      this._layer.context.STATIC_DRAW,
-    );
-
-    const aTexCoordLoc = this._layer.context.getAttribLocation(
-      program,
-      'a_texCoord',
-    );
-    this._layer.context.enableVertexAttribArray(aTexCoordLoc);
-    this._layer.context.vertexAttribPointer(
-      aTexCoordLoc,
-      2,
-      this._layer.context.FLOAT,
-      false,
-      0,
-      0,
-    );
   }
 
   /**
@@ -308,9 +145,12 @@ export class RenderSystem extends System {
     const zoom = this._camera.zoom;
 
     // Start with a standard projection:
-    const matrix = createProjectionMatrix(width, height);
+    const matrix = createProjectionMatrix(width, height); // TODO: cache this somewhere, but also remember to update it if canvas size changes
 
     // 1) Translate so screen center becomes the new origin
+    // TODO: not sure what this does because it uses the width and height of the canvas
+    // and not the sprite/camera coordinates. Might be cachable, might be able to
+    // remove it entirely and just set it in the projection matrix.
     matrix.translate(width / 2, height / 2);
 
     // 2) Scale around that center
@@ -332,5 +172,35 @@ export class RenderSystem extends System {
     matrix.translate(-pivot.x, -pivot.y);
 
     return matrix;
+  }
+}
+
+function logVertexAttribs(gl: WebGL2RenderingContext, program: WebGLProgram) {
+  const numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+  console.log(`Active attributes: ${numAttribs}`);
+
+  for (let i = 0; i < numAttribs; i++) {
+    const info = gl.getActiveAttrib(program, i);
+    if (!info) continue;
+
+    const loc = gl.getAttribLocation(program, info.name);
+    const isEnabled = gl.getVertexAttrib(loc, gl.VERTEX_ATTRIB_ARRAY_ENABLED);
+    const buffer = gl.getVertexAttrib(
+      loc,
+      gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+    );
+    const divisor = gl.getVertexAttrib(loc, gl.VERTEX_ATTRIB_ARRAY_DIVISOR);
+
+    console.log(`Attribute: ${info.name}`);
+    console.log(`  Location: ${loc}`);
+    console.log(`  Enabled: ${isEnabled}`);
+    console.log(`  Buffer bound:`, buffer);
+    console.log(`  Divisor: ${divisor}`);
+
+    const offset = gl.getVertexAttribOffset(
+      loc,
+      gl.VERTEX_ATTRIB_ARRAY_POINTER,
+    );
+    console.log(`  Offset: ${offset}`);
   }
 }

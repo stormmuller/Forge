@@ -88,9 +88,20 @@ export async function createTitleScene(
 
   const image = await imageCache.getOrLoad('star_small.png');
 
-  const sprite = new forge.Sprite({
+  const material = new forge.SpriteMaterial(
+    foregroundRenderLayer.context,
     image,
+  );
+
+  const geometry = forge.createQuadGeometry(foregroundRenderLayer.context);
+
+  const renderable = new forge.Renderable(geometry, material);
+
+  const sprite = new forge.Sprite({
+    renderable,
     renderLayer: foregroundRenderLayer,
+    width: image.width,
+    height: image.height,
   });
 
   const starfieldSystem = new StarfieldSystem(world, sprite);
@@ -129,8 +140,8 @@ function addRenderLayer(
 
   world.addSystem(layerRenderSystem);
 
-  const spriteBatcher = new forge.Entity('sprite batcher', [
-    new forge.SpriteBatchComponent(),
+  const spriteBatcher = new forge.Entity('renderable batcher', [
+    new forge.RenderableBatchComponent(layer),
   ]);
 
   const batchingSystem = new forge.SpriteBatchingSystem(spriteBatcher);

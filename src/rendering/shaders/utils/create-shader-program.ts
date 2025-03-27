@@ -13,7 +13,7 @@ export const createProgram = (
   gl: WebGL2RenderingContext,
   vertexSource: string,
   fragmentSource: string,
-) => {
+): WebGLProgram => {
   const vertexShader = createShader(gl, vertexSource, gl.VERTEX_SHADER);
   const fragmentShader = createShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
 

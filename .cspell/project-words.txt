@@ -3,6 +3,7 @@ attw
 autofetch
 backquote
 Batchable
+cachable
 commitlint
 dbaeumer
 devcontainers
@@ -13,6 +14,7 @@ lerp
 mediump
 Menlo
 pingpong
+Renderable
 requizits
 rnaumovs
 slevesque
