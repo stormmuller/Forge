@@ -57,22 +57,43 @@ export async function createShipPilotScene(
     cameraEntity,
   );
 
-  const spriteBatcher = new forge.Entity('sprite batcher', [
-    new forge.SpriteBatchComponent(),
+  const foregroundBatcher = new forge.Entity('foreground renderable batcher', [
+    new forge.RenderableBatchComponent(foregroundRenderLayer),
   ]);
 
-  const batchingSystem = new forge.SpriteBatchingSystem(spriteBatcher);
+  const backgroundBatcher = new forge.Entity('background renderable batcher', [
+    new forge.RenderableBatchComponent(backgroundRenderLayer),
+  ]);
 
-  world.addEntity(spriteBatcher);
+  const foregroundBatchingSystem = new forge.SpriteBatchingSystem(
+    foregroundBatcher,
+  );
+  const backgroundBatchingSystem = new forge.SpriteBatchingSystem(
+    backgroundBatcher,
+  );
+
+  world.addEntity(foregroundBatcher);
+  world.addEntity(backgroundBatcher);
 
   await createShip(imageCache, foregroundRenderLayer, world);
   createStarfield(world, 10_000, worldSpace);
 
   const image = await imageCache.getOrLoad('star_small.png');
+  const material = new forge.SpriteMaterial(
+    backgroundRenderLayer.context,
+    image,
+  );
+
+  const renderable = new forge.Renderable(
+    forge.createQuadGeometry(backgroundRenderLayer.context),
+    material,
+  );
 
   const sprite = new forge.Sprite({
-    image,
+    renderable,
     renderLayer: backgroundRenderLayer,
+    width: image.width,
+    height: image.height,
   });
 
   const shipMovementSystem = new ShipMovementSystem(inputsEntity, game.time);
@@ -85,7 +106,8 @@ export async function createShipPilotScene(
 
   world.addEntity(cameraEntity);
   world.addSystem(cameraSystem);
-  world.addSystem(batchingSystem);
+  world.addSystem(foregroundBatchingSystem);
+  world.addSystem(backgroundBatchingSystem);
 
   scene.registerUpdatable(world);
   scene.registerStoppable(world);

@@ -1,12 +1,20 @@
-import { PositionComponent } from '../../common';
+import {
+  PositionComponent,
+  RotationComponent,
+  ScaleComponent,
+} from '../../common';
 import { Entity, System } from '../../ecs';
-import { SpriteBatchComponent, SpriteComponent } from '../components';
+import {
+  RenderableBatchComponent,
+  SpriteComponent,
+  type Batchable,
+} from '../components';
 
 /**
  * The `SpriteBatchingSystem` class extends the `System` class and manages the batching of sprites.
  */
 export class SpriteBatchingSystem extends System {
-  private _spriteBatch: SpriteBatchComponent;
+  private _spriteBatch: RenderableBatchComponent;
 
   constructor(spriteBatcherEntity: Entity) {
     super('sprite-batching', [
@@ -15,8 +23,8 @@ export class SpriteBatchingSystem extends System {
     ]);
 
     this._spriteBatch =
-      spriteBatcherEntity.getComponentRequired<SpriteBatchComponent>(
-        SpriteBatchComponent.symbol,
+      spriteBatcherEntity.getComponentRequired<RenderableBatchComponent>(
+        RenderableBatchComponent.symbol,
       );
   }
 
@@ -29,11 +37,39 @@ export class SpriteBatchingSystem extends System {
       SpriteComponent.symbol,
     );
 
-    if (!spriteComponent.enabled || spriteComponent.batched) {
+    if (
+      !spriteComponent.enabled ||
+      spriteComponent.batched ||
+      spriteComponent.sprite.renderLayer !== this._spriteBatch.renderLayer
+    ) {
       return;
     }
 
-    this._spriteBatch.add(entity);
+    const { renderable } = spriteComponent.sprite;
+
+    const position = entity.getComponentRequired<PositionComponent>(
+      PositionComponent.symbol,
+    );
+    const rotation = entity.getComponent<RotationComponent>(
+      RotationComponent.symbol,
+    );
+    const scale = entity.getComponent<ScaleComponent>(ScaleComponent.symbol);
+
+    const batchEntry: Batchable = {
+      renderable,
+      width: spriteComponent.sprite.width,
+      height: spriteComponent.sprite.height,
+      pivot: spriteComponent.sprite.pivot,
+      position,
+      rotation,
+      scale,
+    };
+
+    if (!this._spriteBatch.batches.has(renderable)) {
+      this._spriteBatch.batches.set(renderable, []);
+    }
+
+    this._spriteBatch.batches.get(renderable)!.push(batchEntry);
     spriteComponent.batched = true;
   }
 }

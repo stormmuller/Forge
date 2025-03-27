@@ -1,16 +1,22 @@
 import { Vector2 } from '../math';
 import type { ForgeRenderLayer } from './render-layers';
-import { createTextureFromImage } from './shaders';
+import { Renderable } from './renderable';
 
 /**
  * Options for creating a `Sprite`.
  */
 export type SpriteOptions = {
-  /** The image element to use for the sprite. */
-  image: HTMLImageElement;
-
   /** The render layer to which the sprite belongs. */
   renderLayer: ForgeRenderLayer;
+
+  /** The renderable to use for the sprite. */
+  renderable: Renderable;
+
+  /** The width of the sprite. */
+  width: number;
+
+  /** The height of the sprite. */
+  height: number;
 
   /** The bleed value to apply to the sprite (optional). */
   bleed?: number;
@@ -31,9 +37,6 @@ const defaultOptions = {
  * The `Sprite` class represents a sprite in the rendering system.
  */
 export class Sprite {
-  /** The image element associated with the sprite. */
-  public image: HTMLImageElement;
-
   /** The render layer to which the sprite belongs. */
   public renderLayer: ForgeRenderLayer;
 
@@ -46,28 +49,29 @@ export class Sprite {
   /** The height of the sprite, including the bleed value. */
   public height: number;
 
-  /** The WebGL texture created from the image. */
-  public texture: WebGLTexture;
-
   /** The pivot point of the sprite. */
   public pivot: Vector2;
+
+  /** The sprite material used for rendering. */
+  public readonly renderable: Renderable;
 
   /**
    * Constructs a new instance of the `Sprite` class.
    * @param options - The options for creating the sprite.
    */
   constructor(options: SpriteOptions) {
-    const { image, bleed, pivot, renderLayer } = {
+    const { renderable, bleed, pivot, renderLayer, width, height } = {
       ...defaultOptions,
       ...options,
     };
 
-    this.image = image;
     this.renderLayer = renderLayer;
     this.bleed = bleed;
-    this.width = image.width + bleed;
-    this.height = image.height + bleed;
-    this.texture = createTextureFromImage(renderLayer.context, this.image);
     this.pivot = pivot;
+
+    this.width = width + bleed;
+    this.height = height + bleed;
+
+    this.renderable = renderable;
   }
 }
