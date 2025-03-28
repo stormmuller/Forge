@@ -5,9 +5,14 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
@@ -41,6 +46,8 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: setup
     steps:
       - name: Checkout code
@@ -62,6 +69,8 @@ jobs:
 
   check-types:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: setup
     steps:
       - name: Checkout code
@@ -83,6 +92,8 @@ jobs:
 
   check-spelling:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: setup
     steps:
       - name: Checkout code
@@ -104,6 +115,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [lint, check-types, check-spelling]
     steps:
       - name: Checkout code
@@ -128,6 +141,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [lint, check-types, check-spelling]
     steps:
       - name: Checkout code
