@@ -1,5 +1,8 @@
 name: Sync Dev with Main
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
