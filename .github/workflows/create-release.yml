@@ -59,7 +59,7 @@ jobs:
 
       - name: Create pull request into main
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           gh pr create \
             --title "Release v$VERSION" \
