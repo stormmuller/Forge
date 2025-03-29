@@ -49,9 +49,10 @@ jobs:
         run: npm version ${{ github.event.inputs.release_type }} --no-git-tag-version
 
       - name: Get new version
-        id: get_version
         run: |
-          echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Build package
         run: npm run build
 
