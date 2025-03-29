@@ -1,6 +1,6 @@
 {
   "name": "@stormmuller/forge",
-  "version": "1.1.5",
+  "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -55,7 +55,6 @@
     "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "prettier": "^3.5.3",
-    "semantic-release": "^24.2.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.27.0",
@@ -64,9 +63,9 @@
     "vitest": "^3.0.9"
   },
   "dependencies": {
+    "@rive-app/canvas": "^2.26.5",
     "@types/howler": "^2.2.12",
     "@types/seedrandom": "^3.0.8",
-    "@rive-app/canvas": "^2.26.5",
     "howler": "^2.2.4",
     "seedrandom": "^3.0.5"
   }
