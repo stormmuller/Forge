@@ -1,0 +1,46 @@
+name: Sync Dev with Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-dev:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create sync branch
+        run: |
+          BRANCH="sync/dev-v${{ steps.get_version.outputs.version }}"
+          git checkout -b "$BRANCH"
+          git push origin "$BRANCH"
+
+      - name: Open PR into dev
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "Sync dev with main v${{ steps.get_version.outputs.version }}" \
+            --body "This PR syncs dev with the latest main (v${{ steps.get_version.outputs.version }})." \
+            --base dev \
+            --head "sync/dev-v${{ steps.get_version.outputs.version }}"
