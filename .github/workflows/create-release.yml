@@ -39,10 +39,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Bump version
+      - name: Get new version
+        id: get_version
         run: |
-          npm version ${{ github.event.inputs.release_type }} --no-git-tag-version
-          echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Commit and push to release branch
         run: |
