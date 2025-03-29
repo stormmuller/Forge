@@ -45,6 +45,10 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Bump version
+        run: |
+          npm version ${{ github.event.inputs.release_type }} --no-git-tag-version
+
       - name: Commit and push to release branch
         run: |
           RELEASE_BRANCH="release/v$VERSION"
