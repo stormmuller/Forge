@@ -33,7 +33,7 @@ jobs:
       - name: Get new version
         id: get_version
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=$(node -p "'v' + require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Create Git tag
