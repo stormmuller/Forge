@@ -40,7 +40,7 @@ jobs:
 
       - name: Open PR into dev
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           gh pr create \
             --title "Sync dev with main v${{ steps.get_version.outputs.version }}" \
