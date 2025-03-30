@@ -43,7 +43,7 @@ jobs:
           GH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           gh pr create \
-            --title "Sync dev with main $VERSION" \
+            --title "🔄️ Sync dev with main for $VERSION" \
             --body "This PR syncs dev with the latest main ($VERSION)." \
             --base dev \
             --head "sync/dev-$VERSION"
