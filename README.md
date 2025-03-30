@@ -14,7 +14,7 @@ Forge is a browser-based, code only game engine. It has everything you'd expect 
 Clone the repository and open up the dev environment:
 
 ```sh
-git clone https://github.com/stormmuller/Forge.git && \
+git clone https://github.com/forge-game-engine/Forge.git && \
 cd Forge && \
 code .
 ```

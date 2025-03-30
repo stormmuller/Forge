@@ -19,6 +19,5 @@ requizits
 rnaumovs
 slevesque
 stoppables
-stormmuller
 updatables
 yoavbls
