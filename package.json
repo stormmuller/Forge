@@ -1,5 +1,5 @@
 {
-  "name": "@stormmuller/forge",
+  "name": "@forge-game-engine/forge",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stormmuller/Forge.git"
+    "url": "git+https://github.com/forge-game-engine/Forge.git"
   },
   "scripts": {
     "dev": "vite --config vite.demo.config.js",
