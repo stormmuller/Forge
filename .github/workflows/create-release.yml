@@ -39,7 +39,7 @@ jobs:
       - name: Sync with dev branch
         run: |
           git fetch origin dev
-          git pull dev
+          git pull origin dev
 
       - name: Bump version
         run: |
