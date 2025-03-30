@@ -20,10 +20,10 @@ jobs:
   release-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
+      - name: Checkout dev
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: dev
           fetch-depth: 0
 
       - name: Setup Git
@@ -35,11 +35,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-
-      - name: Sync with dev branch
-        run: |
-          git fetch origin dev
-          git pull origin dev
 
       - name: Bump version
         run: |
@@ -54,20 +49,19 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Commit and push to release branch
+      - name: Build package
+        run: npm run build
+
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.BOT_PAT }}
+        run: npm publish
+
+      - name: Commit and push release
         run: |
-          RELEASE_BRANCH="release/v$VERSION"
-          git checkout -b "$RELEASE_BRANCH"
           git add package.json package-lock.json
           git commit -m "chore(release): v$VERSION"
-          git push origin "$RELEASE_BRANCH"
-
-      - name: Create pull request into main
-        env:
-          GH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          gh pr create \
-            --title "🚀 Release v$VERSION" \
-            --body "Automated release PR for version \`v$VERSION\`" \
-            --base main \
-            --head "release/v$VERSION"
+          git push
+          git tag $VERSION
+          git push origin $VERSION
+          git push origin main
