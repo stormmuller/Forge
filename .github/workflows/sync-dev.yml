@@ -29,12 +29,12 @@ jobs:
       - name: Get new version
         id: get_version
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          VERSION=$(node -p "'v' + require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Create sync branch
         run: |
-          BRANCH="sync/dev-v${{ steps.get_version.outputs.version }}"
+          BRANCH="sync/dev-$VERSION"
           git checkout -b "$BRANCH"
           git push origin "$BRANCH"
 
@@ -43,7 +43,7 @@ jobs:
           GH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           gh pr create \
-            --title "Sync dev with main v${{ steps.get_version.outputs.version }}" \
-            --body "This PR syncs dev with the latest main (v${{ steps.get_version.outputs.version }})." \
+            --title "Sync dev with main $VERSION" \
+            --body "This PR syncs dev with the latest main ($VERSION)." \
             --base dev \
-            --head "sync/dev-v${{ steps.get_version.outputs.version }}"
+            --head "sync/dev-$VERSION"
