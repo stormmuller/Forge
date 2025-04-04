@@ -42,7 +42,7 @@ export {
   decodeAudio,
   decodeFont,
   decodeImage,
-} from '@rive-app/webgl';
+} from '@rive-app/webgl2';
 
 export type {
   AudioAsset,
@@ -65,4 +65,4 @@ export type {
   RuntimeCallback,
   Task,
   VoidCallback,
-} from '@rive-app/webgl';
+} from '@rive-app/webgl2';
