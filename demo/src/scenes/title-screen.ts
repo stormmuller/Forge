@@ -1,4 +1,4 @@
-import { Alignment, Fit, Layout, RiveEventPayload } from '@rive-app/canvas';
+import { Alignment, Fit, Layout, RiveEventPayload } from '@rive-app/webgl';
 import * as forge from '../../../src';
 import { createStarfield } from '../create-starfield';
 import { StarfieldSystem } from '../starfield';

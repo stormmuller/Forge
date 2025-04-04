@@ -20,4 +20,5 @@ rnaumovs
 slevesque
 stoppables
 updatables
+webgl
 yoavbls
