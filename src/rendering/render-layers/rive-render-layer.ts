@@ -4,7 +4,7 @@ import {
   type RiveEventPayload,
   RiveEventType,
   type RiveParameters,
-} from '@rive-app/webgl';
+} from '@rive-app/webgl2';
 import { RenderLayer } from './render-layer';
 import { EventDispatcher, ParameterizedForgeEvent } from '../../events';
 import type { Stoppable } from '../../common';

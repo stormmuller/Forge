@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { RiveCache } from './rive-cache';
-import { RiveFile } from '@rive-app/webgl';
+import { RiveFile } from '@rive-app/webgl2';
 
-vi.mock('@rive-app/webgl', () => {
+vi.mock('@rive-app/webgl2', () => {
   return {
     RiveFile: vi.fn().mockImplementation(({ src, onLoad, onLoadError }) => {
       return {

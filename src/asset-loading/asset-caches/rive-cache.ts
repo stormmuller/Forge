@@ -1,4 +1,4 @@
-import { type AssetLoadCallback, RiveFile } from '@rive-app/webgl';
+import { type AssetLoadCallback, RiveFile } from '@rive-app/webgl2';
 import type { AssetCache } from '../asset-cache';
 
 /**
