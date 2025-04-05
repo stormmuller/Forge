@@ -48,6 +48,7 @@ export class RenderSystem extends System {
 
   public override beforeAll(entities: Entity[]) {
     this._layer.context.clear(this._layer.context.COLOR_BUFFER_BIT);
+
     return entities;
   }
 

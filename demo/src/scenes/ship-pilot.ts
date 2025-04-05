@@ -1,8 +1,8 @@
 import * as forge from '../../../src';
 import { createShip } from '../create-ship';
-import { createStarfield } from '../create-starfield';
 import { ShipMovementSystem } from '../ship';
-import { StarfieldSystem } from '../starfield';
+import { StarComponent, StarSystem } from '../star';
+import { StarfieldComponent, StarfieldSystem } from '../starfield';
 
 export async function createShipPilotScene(
   game: forge.Game,
@@ -76,7 +76,12 @@ export async function createShipPilotScene(
   world.addEntity(backgroundBatcher);
 
   await createShip(imageCache, foregroundRenderLayer, world);
-  createStarfield(world, 10_000, worldSpace);
+
+  const starfieldComponent = new StarfieldComponent(10_000, worldSpace);
+
+  const starField = new forge.Entity('starfield', [starfieldComponent]);
+
+  world.addEntity(starField);
 
   const image = await imageCache.getOrLoad('star_small.png');
   const material = new forge.SpriteMaterial(
@@ -96,11 +101,57 @@ export async function createShipPilotScene(
     height: image.height,
   });
 
-  const shipMovementSystem = new ShipMovementSystem(inputsEntity, game.time);
-  const starfieldSystem = new StarfieldSystem(world, sprite);
-  const animationSystem = new forge.AnimationSystem(game.time);
+  const random = new forge.Random();
 
-  world.addSystems([shipMovementSystem, starfieldSystem, animationSystem]);
+  const createStar = () => {
+    const scaleComponent = new forge.ScaleComponent(0.5, 0.5);
+
+    const starEntity = new forge.Entity('star', [
+      new forge.PositionComponent(0, 0),
+      scaleComponent,
+      new forge.RotationComponent(0),
+      new forge.SpriteComponent(sprite),
+      new forge.AnimationComponent({
+        duration: random.randomFloat(1000, 5000),
+        updateCallback: (value: number) => {
+          scaleComponent.x = value * 0.5;
+          scaleComponent.y = value * 0.5;
+        },
+        loop: 'pingpong',
+      }),
+      new StarComponent(random),
+    ]);
+
+    world.addEntity(starEntity);
+
+    return starEntity;
+  };
+
+  const disposeStar = (entity: forge.Entity) => {
+    starfieldComponent.numberOfStars--;
+    entity.enabled = false;
+  };
+
+  const starPool = new forge.ObjectPool([], createStar, disposeStar);
+
+  const shipMovementSystem = new ShipMovementSystem(inputsEntity, game.time);
+  const animationSystem = new forge.AnimationSystem(game.time);
+  const starSystem = new StarSystem(
+    starPool,
+    new forge.BoxCollider(
+      new forge.Vector2(-2500, -2500),
+      new forge.Vector2(5000, 5000),
+    ),
+  );
+
+  const starfieldSystem = new StarfieldSystem(starPool);
+
+  world.addSystems([
+    shipMovementSystem,
+    starSystem,
+    starfieldSystem,
+    animationSystem,
+  ]);
 
   const cameraSystem = new forge.CameraSystem(inputsEntity, game.time);
 
