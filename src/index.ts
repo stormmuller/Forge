@@ -12,6 +12,7 @@ export * from './physics';
 export * from './rendering';
 export * from './timer';
 export * from './utilities';
+export * from './pooling';
 
 // rive exports
 // we need to export rive from forge, because if the game (consumer of forge) installs their own version then they

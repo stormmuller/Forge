@@ -74,14 +74,6 @@ export default [
           },
         },
       ],
-
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: 'PropertyDefinition[value.type="ArrowFunctionExpression"]',
-          message: 'Class methods should never be arrow functions.',
-        },
-      ],
     },
   },
 ];
