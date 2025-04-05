@@ -13,6 +13,8 @@ export class World implements Updatable, Stoppable {
    */
   private _systemEntities = new Map<string, Set<Entity>>();
 
+  private _enabledEntities = new Array<Entity>(5000);
+
   /**
    * Callbacks to be invoked when systems change.
    */
@@ -48,15 +50,15 @@ export class World implements Updatable, Stoppable {
         throw new Error(`Unable to get entities for system ${system.name}`);
       }
 
-      const enabledEntities = new Array<Entity>();
+      this._enabledEntities.length = 0;
 
       for (const entity of entities) {
         if (entity.enabled) {
-          enabledEntities.push(entity);
+          this._enabledEntities.push(entity);
         }
       }
 
-      system.runSystem(enabledEntities);
+      system.runSystem(this._enabledEntities);
     }
   }
 
