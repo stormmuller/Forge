@@ -1,7 +1,6 @@
 import { Alignment, Fit, Layout, RiveEventPayload } from '@rive-app/webgl2';
 import * as forge from '../../../src';
 import { createStarfield } from '../create-starfield';
-import { StarfieldSystem } from '../starfield';
 import { createShipPilotScene } from './ship-pilot';
 
 const riveFileUri = 'ui.riv';
@@ -38,14 +37,6 @@ export async function createTitleScene(
     new forge.CameraComponent({ allowZooming: false, allowPanning: false }),
     new forge.PositionComponent(0, 0),
   ]);
-
-  const foregroundRenderLayer = addRenderLayer(
-    forge.DEFAULT_LAYERS.foreground,
-    gameContainer,
-    layerService,
-    world,
-    cameraEntity,
-  );
 
   createStarfield(world, 500, worldSpace);
 
@@ -86,28 +77,9 @@ export async function createTitleScene(
     game.deregisterScene(scene);
   });
 
-  const image = await imageCache.getOrLoad('star_small.png');
-
-  const material = new forge.SpriteMaterial(
-    foregroundRenderLayer.context,
-    image,
-  );
-
-  const geometry = forge.createQuadGeometry(foregroundRenderLayer.context);
-
-  const renderable = new forge.Renderable(geometry, material);
-
-  const sprite = new forge.Sprite({
-    renderable,
-    renderLayer: foregroundRenderLayer,
-    width: image.width,
-    height: image.height,
-  });
-
-  const starfieldSystem = new StarfieldSystem(world, sprite);
   const animationSystem = new forge.AnimationSystem(game.time);
 
-  world.addSystems([starfieldSystem, animationSystem]);
+  world.addSystem(animationSystem);
 
   const cameraSystem = new forge.CameraSystem(inputsEntity, game.time);
 
@@ -119,35 +91,4 @@ export async function createTitleScene(
   scene.registerStoppable(riveRenderLayer);
 
   return scene;
-}
-
-function addRenderLayer(
-  layerName: string,
-  gameContainer: HTMLElement,
-  layerService: forge.LayerService,
-  world: forge.World,
-  cameraEntity: forge.Entity,
-) {
-  const canvas = forge.createCanvas(`$forge-layer-${layerName}`, gameContainer);
-  const layer = new forge.ForgeRenderLayer(layerName, canvas);
-
-  layerService.registerLayer(layer);
-
-  const layerRenderSystem = new forge.RenderSystem({
-    layer,
-    cameraEntity,
-  });
-
-  world.addSystem(layerRenderSystem);
-
-  const spriteBatcher = new forge.Entity('renderable batcher', [
-    new forge.RenderableBatchComponent(layer),
-  ]);
-
-  const batchingSystem = new forge.SpriteBatchingSystem(spriteBatcher);
-
-  world.addEntity(spriteBatcher);
-  world.addSystem(batchingSystem);
-
-  return layer;
 }

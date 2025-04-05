@@ -15,8 +15,6 @@ export class SpriteComponent implements Component {
   /** Indicates whether the sprite is enabled or not. */
   public enabled: boolean;
 
-  public batched: boolean;
-
   /** A static symbol property that uniquely identifies the `SpriteComponent`. */
   public static symbol = Symbol('Sprite');
 
@@ -29,6 +27,5 @@ export class SpriteComponent implements Component {
     this.name = SpriteComponent.symbol;
     this.sprite = sprite;
     this.enabled = enabled;
-    this.batched = false;
   }
 }

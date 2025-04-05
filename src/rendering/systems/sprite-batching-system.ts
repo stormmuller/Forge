@@ -28,6 +28,12 @@ export class SpriteBatchingSystem extends System {
       );
   }
 
+  public override beforeAll(entities: Entity[]): Entity[] {
+    this._spriteBatch.batches.clear();
+
+    return entities;
+  }
+
   /**
    * Runs the batching system for the given entity, batching the sprite.
    * @param entity - The entity.
@@ -39,7 +45,6 @@ export class SpriteBatchingSystem extends System {
 
     if (
       !spriteComponent.enabled ||
-      spriteComponent.batched ||
       spriteComponent.sprite.renderLayer !== this._spriteBatch.renderLayer
     ) {
       return;
@@ -70,6 +75,5 @@ export class SpriteBatchingSystem extends System {
     }
 
     this._spriteBatch.batches.get(renderable)!.push(batchEntry);
-    spriteComponent.batched = true;
   }
 }

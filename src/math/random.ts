@@ -11,7 +11,7 @@ export class Random {
    * Creates a new instance of the `Random` class with the given seed.
    * @param seed - The seed for the random number generator.
    */
-  constructor(seed: string) {
+  constructor(seed: string = 'seed') {
     this._rng = seedrandom(seed);
   }
 
