@@ -74,4 +74,17 @@ describe('ObjectPool', () => {
     expect(createCallback).toHaveBeenCalled();
     expect(instance).toBeDefined();
   });
+
+  it('should not add newly created instances to the pool until released', () => {
+    const instance = pool.getOrCreate();
+
+    // Ensure the pool is still empty after creating a new instance
+    expect(() => pool.get()).toThrow('Pool is empty');
+
+    // Release the instance and ensure it is now in the pool
+    pool.release(instance);
+    const reusedInstance = pool.get();
+
+    expect(reusedInstance).toBe(instance);
+  });
 });

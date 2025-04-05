@@ -49,8 +49,6 @@ export class ObjectPool<T extends NonNullable<unknown> = Entity> {
   private _create = (): T => {
     const instance = this._createCallback();
 
-    this._pool.push(instance);
-
     return instance;
   };
 }
