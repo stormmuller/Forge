@@ -4,7 +4,7 @@ export class StarComponent implements forge.Component {
   public name: symbol;
 
   public static symbol = Symbol('Star');
-  public velocity: forge.Vector2;
+  public velocity!: forge.Vector2;
 
   private _random: forge.Random;
 
